@@ -48,6 +48,7 @@ const AndroidHorizontalScrollViewNativeComponent: HostComponent<Props> =
       removeClippedSubviews: true,
       borderTopRightRadius: true,
       borderLeftColor: {process: require('../../StyleSheet/processColor')},
+      accessibilityCollectionInfo: true,
     },
   }));
 
