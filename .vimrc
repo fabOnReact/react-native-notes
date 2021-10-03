@@ -1,0 +1,1 @@
+cnoreabbrev gb .GBrowse<CR>
