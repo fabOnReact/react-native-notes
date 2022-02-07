@@ -1,0 +1,110 @@
+Test Cases
+
+4. Switch has `accessibilityState={{disabled:false}}`
+
+<details><summary>CLICK TO OPEN SOURCECODE</summary>
+<p>
+
+Full SourceCode Available at https://github.com/fabriziobertoglio1987/ReactNativeAwesomeProject/blob/switch-component-does-not-disable-click/App.js
+
+```javascript
+export class App extends React.Component {
+  constructor(props: {}) {
+    super(props);
+    this.state = {disabled: false, accessibilityDisabled: false, value: false};
+  }
+
+  setAccessibilityDisabled(value) {
+    if (value === 'reset') {
+      this.setState({accessibilityDisabled: null});
+    } else {
+      this.setState((state, props) => ({
+        accessibilityDisabled: !state.accessibilityDisabled,
+      }));
+    }
+  }
+
+  setDisabled(value) {
+    if (value === 'reset') {
+      this.setState({disabled: null});
+    } else {
+      this.setState((state, props) => ({
+        disabled: !state.disabled,
+      }));
+    }
+  }
+
+  setValue() {
+    this.setState((state, props) => ({
+      value: !state.value,
+    }));
+  }
+
+  render() {
+    const {disabled, accessibilityDisabled, value} = this.state;
+
+    return (
+      <>
+        <Text>
+          accessibilityState.disabled is set to{' '}
+          <Text style={{color: 'red'}}>
+            {accessibilityDisabled === null
+              ? 'null'
+              : accessibilityDisabled.toString()}
+          </Text>
+        </Text>
+        <Text>
+          disabled is set to{' '}
+          <Text style={{color: 'red'}}>
+            {disabled === null ? 'null' : disabled.toString()}
+          </Text>
+        </Text>
+        <Button
+          accessibilityLabel="enable accessibility label"
+          title={`${
+            accessibilityDisabled ? 'enable' : 'disable'
+          } accessibilityState disabled`}
+          onPress={() => this.setAccessibilityDisabled()}
+        />
+        <Button
+          title={`${disabled ? 'enable' : 'disable'} disabled prop`}
+          onPress={() => this.setDisabled()}
+        />
+        <Button
+          title={`set accessibilityState to null`}
+          onPress={() => this.setAccessibilityDisabled('reset')}
+        />
+        <Button
+          title={`set disabled to null`}
+          onPress={() => this.setDisabled('reset')}
+        />
+        <Switch
+          onValueChange={() => this.setValue()}
+          trackColor={{
+            true: 'yellow',
+            false: 'purple',
+          }}
+          value={value}
+          disabled={disabled}
+          accessibilityState={{disabled: accessibilityDisabled}}
+        />
+      </>
+    );
+  }
+}
+```
+
+</p>
+</details>
+
+**Expected/Actual Result**:
+- The ScreenReader does **not** announce `disabled`.
+- The `Switch` is not **disabled**. Users are allowed to interact with the slider.
+
+**<details><summary>CLICK TO OPEN TESTS RESULTS</summary>**
+<p>
+
+<video src="https://user-images.githubusercontent.com/24992535/152745257-c878b925-13e8-455d-8cb9-ea1398e789a1.mp4" width="1000" />
+
+</p>
+</details>
