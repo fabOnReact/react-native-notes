@@ -118,14 +118,13 @@ public class ReactScrollView extends ScrollView
     this(context, null);
   }
 
-  public ReactScrollView(Context context, @Nullable FpsListener fpsListener) {
-
-  private View getContentView() {
+   private View getContentView() {
     View contentView = getChildAt(0);
     return contentView;
   }
 
-  public ReactScrollView(ReactContext context, @Nullable FpsListener fpsListener) {
+
+  public ReactScrollView(Context context, @Nullable FpsListener fpsListener) {
     super(context);
     mFpsListener = fpsListener;
     mReactBackgroundManager = new ReactViewBackgroundManager(this);
@@ -740,10 +739,6 @@ public class ReactScrollView extends ScrollView
                 getReactScrollViewScrollState().getFinalAnimatedPositionScroll().y,
                 velocityY)
             + getFlingExtrapolatedDistance(velocityY);
-  }
-
-  private View getContentView() {
-    return getChildAt(0);
   }
 
   /**
