@@ -207,8 +207,10 @@ public class ReactScrollView extends ScrollView
           final ReadableMap accessibilityCollectionInfo = (ReadableMap) host.getTag(R.id.accessibility_collection_info);
 
           if (accessibilityCollectionInfo != null) {
-            int rowCount = accessibilityCollectionInfo.getInt("rowCount");
-            int columnCount = accessibilityCollectionInfo.getInt("columnCount");
+            int rowCount = 10; // accessibilityCollectionInfo.getInt("rowCount");
+            int columnCount = 3; // accessibilityCollectionInfo.getInt("columnCount");
+            // int rowCount = accessibilityCollectionInfo.getInt("rowCount");
+            // int columnCount = accessibilityCollectionInfo.getInt("columnCount");
             boolean hierarchical = accessibilityCollectionInfo.getBoolean("hierarchical");
 
             AccessibilityNodeInfoCompat.CollectionInfoCompat collectionInfoCompat = AccessibilityNodeInfoCompat.CollectionInfoCompat.obtain(rowCount, columnCount, hierarchical);

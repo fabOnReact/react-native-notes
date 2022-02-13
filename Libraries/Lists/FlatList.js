@@ -695,7 +695,7 @@ class FlatList<ItemT> extends React.PureComponent<Props<ItemT>, void> {
         keyExtractor={this._keyExtractor}
         accessibilityCollectionInfo={this._getAccessibilityCollectionInfo()}
         accessibilityRole={Platform.select({
-          android: this.props.numColumns > 1 ? 'grid' : 'list',
+          android: this.props.numColumns > 1 ? 'grid' : 'grid',
         })}
         ref={this._captureRef}
         viewabilityConfigCallbackPairs={this._virtualizedListPairs}
