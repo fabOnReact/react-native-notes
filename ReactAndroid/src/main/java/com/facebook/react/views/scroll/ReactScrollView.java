@@ -167,7 +167,7 @@ public class ReactScrollView extends ScrollView
                 // Happens when getItemLayout is not passed in FlatList which adds an additional
                 // View in the hierarchy.
                 if (childCount > 0 && accessibilityCollectionItemInfo == null) {
-                  View nestedNextChild = ((ViewGroup) nextChild).getChildAt(0);
+                  View nestedNextChild = ((ViewGroup) nextChild).getChildAt(childCount - 1);
                   if (nestedNextChild != null) {
                     ReadableMap nestedChildAccessibilityInfo =
                         (ReadableMap)
@@ -412,7 +412,7 @@ public class ReactScrollView extends ScrollView
   private boolean isPartiallyScrolledInView(View descendent) {
     int scrollDelta = getScrollDelta(descendent);
     descendent.getDrawingRect(mTempRect);
-    return scrollDelta != 0 && Math.abs(scrollDelta) < mTempRect.width();
+    return scrollDelta != 0 && Math.abs(scrollDelta) < mTempRect.height();
   }
 
   private void scrollToChild(View child) {
