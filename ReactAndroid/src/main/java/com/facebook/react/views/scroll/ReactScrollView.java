@@ -24,8 +24,8 @@ import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
+import android.view.accessibility.AccessibilityEvent;
 import android.widget.OverScroller;
 import android.widget.ScrollView;
 import androidx.annotation.Nullable;
@@ -35,11 +35,15 @@ import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
 import com.facebook.common.logging.FLog;
 import com.facebook.infer.annotation.Assertions;
 import com.facebook.react.R;
+import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.bridge.WritableNativeMap;
 import com.facebook.react.common.ReactConstants;
 import com.facebook.react.uimanager.FabricViewStateManager;
 import com.facebook.react.uimanager.MeasureSpecAssertions;
 import com.facebook.react.uimanager.PointerEvents;
+import com.facebook.react.uimanager.PixelUtil;
 import com.facebook.react.uimanager.ReactAccessibilityDelegate;
 import com.facebook.react.uimanager.ReactClippingViewGroup;
 import com.facebook.react.uimanager.ReactClippingViewGroupHelper;
@@ -114,10 +118,11 @@ public class ReactScrollView extends ScrollView
     this(context, null);
   }
 
-  private View getContentView() {
+   private View getContentView() {
     View contentView = getChildAt(0);
     return contentView;
   }
+
 
   public ReactScrollView(Context context, @Nullable FpsListener fpsListener) {
     super(context);
@@ -129,103 +134,91 @@ public class ReactScrollView extends ScrollView
     setScrollBarStyle(SCROLLBARS_OUTSIDE_OVERLAY);
 
     ViewCompat.setAccessibilityDelegate(
-        this,
-        new AccessibilityDelegateCompat() {
+      this,
+      new AccessibilityDelegateCompat() {
 
-          @Override
-          public void onInitializeAccessibilityEvent(View host, AccessibilityEvent event) {
-            super.onInitializeAccessibilityEvent(host, event);
-            event.setScrollable(mScrollEnabled);
-            // if (event.getEventType() == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED) {
-            final ReadableMap accessibilityCollectionInfo =
-                (ReadableMap) host.getTag(R.id.accessibility_collection_info);
-            FLog.w("TESTING::ReactScrollView", "event.getEventType(): " + (event.getEventType()));
+        @Override
+        public void onInitializeAccessibilityEvent(View host, AccessibilityEvent event) {
+          super.onInitializeAccessibilityEvent(host, event);
+          event.setScrollable(mScrollEnabled);
+          final ReadableMap accessibilityCollectionInfo = (ReadableMap) host.getTag(R.id.accessibility_collection_info);
 
-            if (accessibilityCollectionInfo != null) {
-              event.setItemCount(accessibilityCollectionInfo.getInt("itemCount"));
-              View contentView = getContentView();
-              Integer firstVisibleIndex = null;
-              Integer lastVisibleIndex = null;
+          if (accessibilityCollectionInfo != null) {
+            event.setItemCount(accessibilityCollectionInfo.getInt("itemCount"));
+            View contentView = getContentView();
+            Integer firstVisibleIndex = null;
+            Integer lastVisibleIndex = null;
 
-              if (!(contentView instanceof ViewGroup)) {
+            if (!(contentView instanceof ViewGroup)) {
+              return;
+            }
+
+            for(int index = 0; index < ((ViewGroup) contentView).getChildCount(); index++) {
+              View nextChild = ((ViewGroup) contentView).getChildAt(index);
+              boolean isVisible = isPartiallyScrolledInView(nextChild);
+
+              ReadableMap accessibilityCollectionItemInfo = (ReadableMap) nextChild.getTag(R.id.accessibility_collection_item_info);
+
+              if (!(nextChild instanceof ViewGroup)) {
                 return;
               }
 
-              for (int index = 0; index < ((ViewGroup) contentView).getChildCount(); index++) {
-                View nextChild = ((ViewGroup) contentView).getChildAt(index);
+              int childCount =  ((ViewGroup) nextChild).getChildCount();
 
-                ReadableMap accessibilityCollectionItemInfo =
-                    (ReadableMap) nextChild.getTag(R.id.accessibility_collection_item_info);
-
-                if (!(nextChild instanceof ViewGroup)) {
-                  return;
-                }
-
-                int childCount = ((ViewGroup) nextChild).getChildCount();
-                if (childCount > 0 && accessibilityCollectionItemInfo == null) {
-                  for (int child = 0; child < childCount; child++) {
-                    View nestedNextChild = ((ViewGroup) nextChild).getChildAt(child);
-                    if (nestedNextChild != null) {
-                      ReadableMap nestedChildAccessibilityInfo =
-                          (ReadableMap)
-                              nestedNextChild.getTag(R.id.accessibility_collection_item_info);
-                      if (nestedChildAccessibilityInfo != null
-                          && isPartiallyScrolledInView(nestedNextChild)) {
-                        int currentIndex = nestedChildAccessibilityInfo.getInt("itemIndex");
-                        if (firstVisibleIndex == null || firstVisibleIndex > currentIndex) {
-                          firstVisibleIndex = (int) currentIndex;
-                        }
-                        if (currentIndex == 1) {
-                          FLog.w("TESTING::ReactScrollView", "currentIndex: " + (currentIndex));
-                          FLog.w(
-                              "TESTING::ReactScrollView",
-                              "firstVisibleIndex: " + (firstVisibleIndex));
-                        }
-                        if (lastVisibleIndex == null || lastVisibleIndex < currentIndex) {
-                          lastVisibleIndex = (int) currentIndex;
-                        }
-                      }
-                    }
+              // If this child's accessibilityCollectionItemInfo is null, we'll check one more nested child.
+              // Happens when getItemLayout is not passed in FlatList which adds an additional View in the hierarchy.
+              if (childCount > 0 && accessibilityCollectionItemInfo == null) {
+                View nestedNextChild =  ((ViewGroup) nextChild).getChildAt(0);
+                if (nestedNextChild != null) {
+                  ReadableMap nestedChildAccessibilityInfo = (ReadableMap) nestedNextChild.getTag(R.id.accessibility_collection_item_info);
+                  if (nestedChildAccessibilityInfo != null) {
+                    accessibilityCollectionItemInfo = nestedChildAccessibilityInfo;
                   }
                 }
               }
+
+              if (isVisible == true && accessibilityCollectionItemInfo != null) {
+                if(firstVisibleIndex == null) {
+                  firstVisibleIndex = accessibilityCollectionItemInfo.getInt("itemIndex");
+                }
+                lastVisibleIndex = accessibilityCollectionItemInfo.getInt("itemIndex");;
+              }
+
               if (firstVisibleIndex != null && lastVisibleIndex != null) {
                 event.setFromIndex(firstVisibleIndex);
                 event.setToIndex(lastVisibleIndex);
               }
             }
-            // }
+          }
+        }
+
+        @Override
+        public void onInitializeAccessibilityNodeInfo(
+          View host, AccessibilityNodeInfoCompat info) {
+          super.onInitializeAccessibilityNodeInfo(host, info);
+
+          final ReactAccessibilityDelegate.AccessibilityRole accessibilityRole =
+            (ReactAccessibilityDelegate.AccessibilityRole) host.getTag(R.id.accessibility_role);
+
+          if (accessibilityRole != null) {
+            ReactAccessibilityDelegate.setRole(info, accessibilityRole, host.getContext());
           }
 
-          @Override
-          public void onInitializeAccessibilityNodeInfo(
-              View host, AccessibilityNodeInfoCompat info) {
-            super.onInitializeAccessibilityNodeInfo(host, info);
+          final ReadableMap accessibilityCollectionInfo = (ReadableMap) host.getTag(R.id.accessibility_collection_info);
 
-            final ReactAccessibilityDelegate.AccessibilityRole accessibilityRole =
-                (ReactAccessibilityDelegate.AccessibilityRole) host.getTag(R.id.accessibility_role);
+          if (accessibilityCollectionInfo != null) {
+            int rowCount = accessibilityCollectionInfo.getInt("rowCount");
+            int columnCount = accessibilityCollectionInfo.getInt("columnCount");
+            boolean hierarchical = accessibilityCollectionInfo.getBoolean("hierarchical");
 
-            if (accessibilityRole != null) {
-              ReactAccessibilityDelegate.setRole(info, accessibilityRole, host.getContext());
-            }
-
-            final ReadableMap accessibilityCollectionInfo =
-                (ReadableMap) host.getTag(R.id.accessibility_collection_info);
-
-            if (accessibilityCollectionInfo != null) {
-              int rowCount = accessibilityCollectionInfo.getInt("rowCount");
-              int columnCount = accessibilityCollectionInfo.getInt("columnCount");
-              boolean hierarchical = accessibilityCollectionInfo.getBoolean("hierarchical");
-
-              AccessibilityNodeInfoCompat.CollectionInfoCompat collectionInfoCompat =
-                  AccessibilityNodeInfoCompat.CollectionInfoCompat.obtain(
-                      rowCount, columnCount, hierarchical);
-              info.setCollectionInfo(collectionInfoCompat);
-            }
-
-            info.setScrollable(mScrollEnabled);
+            AccessibilityNodeInfoCompat.CollectionInfoCompat collectionInfoCompat = AccessibilityNodeInfoCompat.CollectionInfoCompat.obtain(rowCount, columnCount, hierarchical);
+            info.setCollectionInfo(collectionInfoCompat);
           }
-        });
+
+          info.setScrollable(mScrollEnabled);
+        }
+      });
+
   }
 
   @Override
@@ -411,23 +404,11 @@ public class ReactScrollView extends ScrollView
     return computeScrollDeltaToGetChildRectOnScreen(mTempRect);
   }
 
-  /** Returns whether the given descendent is scrolled fully in view */
-  private boolean isScrolledInView(View descendent) {
-    return getScrollDelta(descendent) == 0;
-  }
-
   /** Returns whether the given descendent is partially scrolled in view */
   private boolean isPartiallyScrolledInView(View descendent) {
     int scrollDelta = getScrollDelta(descendent);
     descendent.getDrawingRect(mTempRect);
-    return scrollDelta != 0 && Math.abs(scrollDelta) < mTempRect.height();
-  }
-
-  /** Returns whether the given descendent is "mostly" (>50%) scrolled in view */
-  private boolean isMostlyScrolledInView(View descendent) {
-    int scrollDelta = getScrollDelta(descendent);
-    descendent.getDrawingRect(mTempRect);
-    return scrollDelta != 0 && Math.abs(scrollDelta) < (mTempRect.height() / 2);
+    return scrollDelta != 0 && Math.abs(scrollDelta) < mTempRect.width();
   }
 
   private void scrollToChild(View child) {
