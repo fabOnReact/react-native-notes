@@ -109,10 +109,6 @@ public class ReactScrollView extends ScrollView
       new ReactScrollViewScrollState(ViewCompat.LAYOUT_DIRECTION_LTR);
   private final ValueAnimator DEFAULT_FLING_ANIMATOR = ObjectAnimator.ofInt(this, "scrollY", 0, 0);
   private PointerEvents mPointerEvents = PointerEvents.AUTO;
-  public String BLACK = "\u001B[47m\u001B[30m";
-  public String WHITE = "\u001B[40m\u001B[37m";
-  public String PURPLE = "\u001B[45m\u001B[37m";
-  public String RESET = "\u001B[0m";
 
   public ReactScrollView(Context context) {
     this(context, null);
@@ -155,85 +151,16 @@ public class ReactScrollView extends ScrollView
 
               for (int index = 0; index < ((ViewGroup) contentView).getChildCount(); index++) {
                 View nextChild = ((ViewGroup) contentView).getChildAt(index);
-                int childCount = ((ViewGroup) nextChild).getChildCount();
                 boolean isVisible = isPartiallyScrolledInView(nextChild);
-                /*
-                String lastChildIndex = "undefined";
-                String firstChildIndex = "undefined";
-                if (index == 3 && firstVisibleIndex > 17) {
-                  // get the number first child
-                  View firstChild = ((ViewGroup) nextChild).getChildAt(0);
-                  if (firstChild != null) {
-                    ReadableMap firstChildData =
-                        (ReadableMap) firstChild.getTag(R.id.accessibility_collection_item_info);
-                    firstChildIndex = "" + (firstChildData.getInt("itemIndex") + 1);
-                  }
-                  // get the number last child
-                  View lastChild = ((ViewGroup) nextChild).getChildAt(childCount - 1);
-                  if (lastChild != null) {
-                    ReadableMap lastChildData =
-                        (ReadableMap) lastChild.getTag(R.id.accessibility_collection_item_info);
-                    lastChildIndex = "" + (lastChildData.getInt("itemIndex") + 1);
-                  }
-                  // compute itemIndexDebug
-                  String itemIndexDebug = firstChildIndex + " - " + lastChildIndex;
-                  // compute isVisible
-                  nextChild.getDrawingRect(mTempRect);
-                  FLog.w(
-                      "TESTING::ReactScrollView",
-                      BLACK
-                          + "mTempRect.top: "
-                          + (mTempRect.top)
-                          + " at itemIndexDebug: "
-                          + (itemIndexDebug)
-                          + RESET);
-                  FLog.w(
-                      "TESTING::ReactScrollView",
-                      BLACK
-                          + "mTempRect.bottom: "
-                          + (mTempRect.bottom)
-                          + " at itemIndexDebug: "
-                          + (itemIndexDebug)
-                          + RESET);
-                  offsetDescendantRectToMyCoords(nextChild, mTempRect);
-                  int scrollDelta = computeScrollDeltaToGetChildRectOnScreen(mTempRect);
-                  nextChild.getDrawingRect(mTempRect);
-                  isVisible = scrollDelta != 0 && Math.abs(scrollDelta) < mTempRect.height();
-                  if (scrollDelta == 0 && !isVisible) {
-                    FLog.w(
-                        "TESTING::ReactScrollView",
-                        PURPLE
-                            + "scrollDelta: "
-                            + (scrollDelta)
-                            + " at itemIndexDebug: "
-                            + (itemIndexDebug)
-                            + RESET);
-                    FLog.w(
-                        "TESTING::ReactScrollView",
-                        WHITE
-                            + "mTempRect.top: "
-                            + (mTempRect.top)
-                            + " at itemIndexDebug: "
-                            + (itemIndexDebug)
-                            + RESET);
-                    FLog.w(
-                        "TESTING::ReactScrollView",
-                        WHITE
-                            + "mTempRect.bottom: "
-                            + (mTempRect.bottom)
-                            + " at itemIndexDebug: "
-                            + (itemIndexDebug)
-                            + RESET);
-                  }
-                }
-                */
-                // if (index == 3) isVisible = true;
+
                 ReadableMap accessibilityCollectionItemInfo =
                     (ReadableMap) nextChild.getTag(R.id.accessibility_collection_item_info);
 
                 if (!(nextChild instanceof ViewGroup)) {
                   return;
                 }
+
+                int childCount = ((ViewGroup) nextChild).getChildCount();
 
                 // If this child's accessibilityCollectionItemInfo is null, we'll check one more
                 // nested child.
@@ -255,9 +182,6 @@ public class ReactScrollView extends ScrollView
                     }
                   }
                 }
-                // FLog.w(
-                //     "TESTING::ReactScrollView",
-                //     BLACK + "isVisible: " + (isVisible) + " at index: " + (index) + RESET);
 
                 if (isVisible == true && accessibilityCollectionItemInfo != null) {
                   if (firstVisibleIndex == null) {
@@ -492,7 +416,7 @@ public class ReactScrollView extends ScrollView
   private boolean isPartiallyScrolledInView(View descendent) {
     int scrollDelta = getScrollDelta(descendent);
     descendent.getDrawingRect(mTempRect);
-    return Math.abs(scrollDelta) < mTempRect.height();
+    return scrollDelta != 0 && Math.abs(scrollDelta) < mTempRect.height();
   }
 
   private void scrollToChild(View child) {
