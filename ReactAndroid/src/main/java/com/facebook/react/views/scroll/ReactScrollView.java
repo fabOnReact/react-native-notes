@@ -416,7 +416,7 @@ public class ReactScrollView extends ScrollView
   private boolean isPartiallyScrolledInView(View descendent) {
     int scrollDelta = getScrollDelta(descendent);
     descendent.getDrawingRect(mTempRect);
-    return scrollDelta != 0 && Math.abs(scrollDelta) < mTempRect.height();
+    return Math.abs(scrollDelta) < mTempRect.height();
   }
 
   private void scrollToChild(View child) {
