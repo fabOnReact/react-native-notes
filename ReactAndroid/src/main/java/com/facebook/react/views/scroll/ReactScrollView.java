@@ -167,13 +167,15 @@ public class ReactScrollView extends ScrollView
                 // Happens when getItemLayout is not passed in FlatList which adds an additional
                 // View in the hierarchy.
                 if (childCount > 0 && accessibilityCollectionItemInfo == null) {
-                  View nestedNextChild = ((ViewGroup) nextChild).getChildAt(childCount - 1);
-                  if (nestedNextChild != null) {
-                    ReadableMap nestedChildAccessibilityInfo =
-                        (ReadableMap)
-                            nestedNextChild.getTag(R.id.accessibility_collection_item_info);
-                    if (nestedChildAccessibilityInfo != null) {
-                      accessibilityCollectionItemInfo = nestedChildAccessibilityInfo;
+                  for (int child = 0; child < childCount; child++) {
+                    View nestedNextChild = ((ViewGroup) nextChild).getChildAt(child);
+                    if (nestedNextChild != null) {
+                      ReadableMap nestedChildAccessibilityInfo =
+                          (ReadableMap)
+                              nestedNextChild.getTag(R.id.accessibility_collection_item_info);
+                      if (nestedChildAccessibilityInfo != null) {
+                        accessibilityCollectionItemInfo = nestedChildAccessibilityInfo;
+                      }
                     }
                   }
                 }
@@ -183,7 +185,6 @@ public class ReactScrollView extends ScrollView
                     firstVisibleIndex = accessibilityCollectionItemInfo.getInt("itemIndex");
                   }
                   lastVisibleIndex = accessibilityCollectionItemInfo.getInt("itemIndex");
-                  ;
                 }
 
                 if (firstVisibleIndex != null && lastVisibleIndex != null) {
