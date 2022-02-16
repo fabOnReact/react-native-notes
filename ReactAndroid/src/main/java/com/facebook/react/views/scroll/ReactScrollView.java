@@ -176,6 +176,9 @@ public class ReactScrollView extends ScrollView
                       if (nestedChildAccessibilityInfo != null) {
                         accessibilityCollectionItemInfo = nestedChildAccessibilityInfo;
                       }
+                      if (firstVisibleIndex == null) {
+                        firstVisibleIndex = accessibilityCollectionItemInfo.getInt("itemIndex");
+                      }
                     }
                   }
                 }
