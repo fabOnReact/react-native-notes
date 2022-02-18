@@ -8,14 +8,12 @@
 package com.facebook.react.uimanager;
 
 import android.content.Context;
-import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.text.SpannableString;
 import android.text.style.URLSpan;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.accessibility.AccessibilityEvent;
 import androidx.annotation.Nullable;
 import androidx.core.view.AccessibilityDelegateCompat;
@@ -23,6 +21,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.AccessibilityActionCompat;
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.RangeInfoCompat;
+import com.facebook.common.logging.FLog;
 import com.facebook.react.R;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Dynamic;
@@ -45,7 +44,6 @@ import java.util.HashMap;
  * AccessibilityNodeInfo.
  */
 public class ReactAccessibilityDelegate extends AccessibilityDelegateCompat {
-
   private static final String TAG = "ReactAccessibilityDelegate";
   public static final String TOP_ACCESSIBILITY_ACTION_EVENT = "topAccessibilityAction";
   private static int sCounter = 0x3f000000;
@@ -226,7 +224,7 @@ public class ReactAccessibilityDelegate extends AccessibilityDelegateCompat {
         (ReadableArray) host.getTag(R.id.accessibility_actions);
 
     final ReadableMap accessibilityCollectionItemInfo =
-      (ReadableMap) host.getTag(R.id.accessibility_collection_item_info);
+        (ReadableMap) host.getTag(R.id.accessibility_collection_item_info);
     if (accessibilityCollectionItemInfo != null) {
       int rowIndex = accessibilityCollectionItemInfo.getInt("rowIndex");
       int columnIndex = accessibilityCollectionItemInfo.getInt("columnIndex");
@@ -234,7 +232,9 @@ public class ReactAccessibilityDelegate extends AccessibilityDelegateCompat {
       int columnSpan = accessibilityCollectionItemInfo.getInt("columnSpan");
       boolean heading = accessibilityCollectionItemInfo.getBoolean("heading");
 
-      AccessibilityNodeInfoCompat.CollectionItemInfoCompat collectionItemInfoCompat = AccessibilityNodeInfoCompat.CollectionItemInfoCompat.obtain(rowIndex, rowSpan, columnIndex, columnSpan, heading);
+      AccessibilityNodeInfoCompat.CollectionItemInfoCompat collectionItemInfoCompat =
+          AccessibilityNodeInfoCompat.CollectionItemInfoCompat.obtain(
+              rowIndex, rowSpan, columnIndex, columnSpan, heading);
       info.setCollectionItemInfo(collectionItemInfoCompat);
     }
 
@@ -292,7 +292,6 @@ public class ReactAccessibilityDelegate extends AccessibilityDelegateCompat {
       info.setViewIdResourceName(testId);
     }
   }
-
 
   @Override
   public void onInitializeAccessibilityEvent(View host, AccessibilityEvent event) {
@@ -437,6 +436,27 @@ public class ReactAccessibilityDelegate extends AccessibilityDelegateCompat {
       final AccessibilityNodeInfoCompat.CollectionItemInfoCompat itemInfo =
           AccessibilityNodeInfoCompat.CollectionItemInfoCompat.obtain(0, 1, 0, 1, true);
       nodeInfo.setCollectionItemInfo(itemInfo);
+    } else if (role.equals(AccessibilityRole.GRID)) {
+      /*
+      final ReactAccessibilityDelegate.AccessibilityRole accessibilityRole = AccessibilityRole.GRID;
+      FLog.w(
+          "TESTING::ReactAccessibilityDelegate",
+              "accessibilityRole: "
+              + (accessibilityRole)
+              + " at ReactAccessibilityDelegate: "
+              );
+      ReactAccessibilityDelegate.setRole(nodeInfo, accessibilityRole, context);
+
+      int rowCount = 10;
+      int columnCount = 3;
+      boolean hierarchical = false;
+
+      AccessibilityNodeInfoCompat.CollectionInfoCompat collectionInfoCompat =
+          AccessibilityNodeInfoCompat.CollectionInfoCompat.obtain(
+              rowCount, columnCount, hierarchical);
+      nodeInfo.setCollectionInfo(collectionInfoCompat);
+      nodeInfo.setScrollable(true);
+      */
     } else if (role.equals(AccessibilityRole.ALERT)) {
       nodeInfo.setRoleDescription(context.getString(R.string.alert_description));
     } else if (role.equals(AccessibilityRole.COMBOBOX)) {

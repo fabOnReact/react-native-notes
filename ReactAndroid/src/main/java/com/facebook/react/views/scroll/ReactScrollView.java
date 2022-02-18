@@ -109,6 +109,10 @@ public class ReactScrollView extends ScrollView
       new ReactScrollViewScrollState(ViewCompat.LAYOUT_DIRECTION_LTR);
   private final ValueAnimator DEFAULT_FLING_ANIMATOR = ObjectAnimator.ofInt(this, "scrollY", 0, 0);
   private PointerEvents mPointerEvents = PointerEvents.AUTO;
+  public String BLACK = "\u001B[47m\u001B[30m";
+  public String WHITE = "\u001B[40m\u001B[37m";
+  public String PURPLE = "\u001B[45m\u001B[37m";
+  public String RESET = "\u001B[0m";
 
   public ReactScrollView(Context context) {
     this(context, null);
@@ -191,8 +195,8 @@ public class ReactScrollView extends ScrollView
                 }
 
                 if (firstVisibleIndex != null && lastVisibleIndex != null) {
-                  event.setFromIndex(firstVisibleIndex);
-                  event.setToIndex(lastVisibleIndex);
+                  // event.setFromIndex(firstVisibleIndex);
+                  // event.setToIndex(lastVisibleIndex);
                 }
               }
             }
@@ -205,7 +209,6 @@ public class ReactScrollView extends ScrollView
 
             final ReactAccessibilityDelegate.AccessibilityRole accessibilityRole =
                 (ReactAccessibilityDelegate.AccessibilityRole) host.getTag(R.id.accessibility_role);
-
             if (accessibilityRole != null) {
               ReactAccessibilityDelegate.setRole(info, accessibilityRole, host.getContext());
             }
@@ -214,9 +217,14 @@ public class ReactScrollView extends ScrollView
                 (ReadableMap) host.getTag(R.id.accessibility_collection_info);
 
             if (accessibilityCollectionInfo != null) {
+              /*
               int rowCount = accessibilityCollectionInfo.getInt("rowCount");
               int columnCount = accessibilityCollectionInfo.getInt("columnCount");
               boolean hierarchical = accessibilityCollectionInfo.getBoolean("hierarchical");
+              */
+              int rowCount = 10;
+              int columnCount = 3;
+              boolean hierarchical = false;
 
               AccessibilityNodeInfoCompat.CollectionInfoCompat collectionInfoCompat =
                   AccessibilityNodeInfoCompat.CollectionInfoCompat.obtain(
