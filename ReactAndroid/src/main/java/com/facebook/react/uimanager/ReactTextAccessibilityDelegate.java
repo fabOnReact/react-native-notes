@@ -86,103 +86,6 @@ public class ReactTextAccessibilityDelegate extends ExploreByTouchHelper {
     mHandler.sendMessageDelayed(msg, TIMEOUT_SEND_ACCESSIBILITY_EVENT);
   }
 
-  /**
-   * These roles are defined by Google's TalkBack screen reader, and this list should be kept up to
-   * date with their implementation. Details can be seen in their source code here:
-   *
-   * <p>https://github.com/google/talkback/blob/master/utils/src/main/java/Role.java
-   */
-  public enum AccessibilityRole {
-    NONE,
-    BUTTON,
-    TOGGLEBUTTON,
-    LINK,
-    SEARCH,
-    IMAGE,
-    IMAGEBUTTON,
-    KEYBOARDKEY,
-    TEXT,
-    ADJUSTABLE,
-    SUMMARY,
-    HEADER,
-    ALERT,
-    CHECKBOX,
-    COMBOBOX,
-    MENU,
-    MENUBAR,
-    MENUITEM,
-    PROGRESSBAR,
-    RADIO,
-    RADIOGROUP,
-    SCROLLBAR,
-    SPINBUTTON,
-    SWITCH,
-    TAB,
-    TABLIST,
-    TIMER,
-    LIST,
-    TOOLBAR;
-
-    public static String getValue(AccessibilityRole role) {
-      switch (role) {
-        case BUTTON:
-          return "android.widget.Button";
-        case TOGGLEBUTTON:
-          return "android.widget.ToggleButton";
-        case SEARCH:
-          return "android.widget.EditText";
-        case IMAGE:
-          return "android.widget.ImageView";
-        case IMAGEBUTTON:
-          return "android.widget.ImageButon";
-        case KEYBOARDKEY:
-          return "android.inputmethodservice.Keyboard$Key";
-        case TEXT:
-          return "android.widget.TextView";
-        case ADJUSTABLE:
-          return "android.widget.SeekBar";
-        case CHECKBOX:
-          return "android.widget.CheckBox";
-        case RADIO:
-          return "android.widget.RadioButton";
-        case SPINBUTTON:
-          return "android.widget.SpinButton";
-        case SWITCH:
-          return "android.widget.Switch";
-        case LIST:
-          return "android.widget.AbsListView";
-        case NONE:
-        case LINK:
-        case SUMMARY:
-        case HEADER:
-        case ALERT:
-        case COMBOBOX:
-        case MENU:
-        case MENUBAR:
-        case MENUITEM:
-        case PROGRESSBAR:
-        case RADIOGROUP:
-        case SCROLLBAR:
-        case TAB:
-        case TABLIST:
-        case TIMER:
-        case TOOLBAR:
-          return "android.view.View";
-        default:
-          throw new IllegalArgumentException("Invalid accessibility role value: " + role);
-      }
-    }
-
-    public static AccessibilityRole fromValue(@Nullable String value) {
-      for (AccessibilityRole role : AccessibilityRole.values()) {
-        if (role.name().equalsIgnoreCase(value)) {
-          return role;
-        }
-      }
-      throw new IllegalArgumentException("Invalid accessibility role value: " + value);
-    }
-  }
-
   private final HashMap<Integer, String> mAccessibilityActionsMap;
 
   // State constants for states which have analogs in AccessibilityNodeInfo
@@ -219,8 +122,8 @@ public class ReactTextAccessibilityDelegate extends ExploreByTouchHelper {
   @Override
   public void onInitializeAccessibilityNodeInfo(View host, AccessibilityNodeInfoCompat info) {
     super.onInitializeAccessibilityNodeInfo(host, info);
-    final AccessibilityRole accessibilityRole =
-        (AccessibilityRole) host.getTag(R.id.accessibility_role);
+    final ReactAccessibilityDelegate.AccessibilityRole accessibilityRole =
+        (ReactAccessibilityDelegate.AccessibilityRole) host.getTag(R.id.accessibility_role);
     if (accessibilityRole != null) {
       setRole(info, accessibilityRole, host.getContext());
     }
@@ -359,10 +262,10 @@ public class ReactTextAccessibilityDelegate extends ExploreByTouchHelper {
 
       // In order to make Talkback announce the change of the adjustable's value,
       // schedule to send a TYPE_VIEW_SELECTED event after performing the scroll actions.
-      final AccessibilityRole accessibilityRole =
-          (AccessibilityRole) host.getTag(R.id.accessibility_role);
+      final ReactAccessibilityDelegate.AccessibilityRole accessibilityRole =
+          (ReactAccessibilityDelegate.AccessibilityRole) host.getTag(R.id.accessibility_role);
       final ReadableMap accessibilityValue = (ReadableMap) host.getTag(R.id.accessibility_value);
-      if (accessibilityRole == AccessibilityRole.ADJUSTABLE
+      if (accessibilityRole == ReactAccessibilityDelegate.AccessibilityRole.ADJUSTABLE
           && (action == AccessibilityActionCompat.ACTION_SCROLL_FORWARD.getId()
               || action == AccessibilityActionCompat.ACTION_SCROLL_BACKWARD.getId())) {
         if (accessibilityValue != null && !accessibilityValue.hasKey("text")) {
@@ -389,7 +292,7 @@ public class ReactTextAccessibilityDelegate extends ExploreByTouchHelper {
         final boolean boolValue = value.asBoolean();
         info.setCheckable(true);
         info.setChecked(boolValue);
-        if (info.getClassName().equals(AccessibilityRole.getValue(AccessibilityRole.SWITCH))) {
+        if (info.getClassName().equals(ReactAccessibilityDelegate.AccessibilityRole.getValue(ReactAccessibilityDelegate.AccessibilityRole.SWITCH))) {
           info.setText(
               context.getString(
                   boolValue ? R.string.state_on_description : R.string.state_off_description));
@@ -403,54 +306,54 @@ public class ReactTextAccessibilityDelegate extends ExploreByTouchHelper {
   // TODO: Eventually support for other languages on talkback
 
   public static void setRole(
-      AccessibilityNodeInfoCompat nodeInfo, AccessibilityRole role, final Context context) {
+      AccessibilityNodeInfoCompat nodeInfo, ReactAccessibilityDelegate.AccessibilityRole role, final Context context) {
     if (role == null) {
-      role = AccessibilityRole.NONE;
+      role = ReactAccessibilityDelegate.AccessibilityRole.NONE;
     }
-    nodeInfo.setClassName(AccessibilityRole.getValue(role));
-    if (role.equals(AccessibilityRole.LINK)) {
+    nodeInfo.setClassName(ReactAccessibilityDelegate.AccessibilityRole.getValue(role));
+    if (role.equals(ReactAccessibilityDelegate.AccessibilityRole.LINK)) {
       nodeInfo.setRoleDescription(context.getString(R.string.link_description));
-    } else if (role.equals(AccessibilityRole.IMAGE)) {
+    } else if (role.equals(ReactAccessibilityDelegate.AccessibilityRole.IMAGE)) {
       nodeInfo.setRoleDescription(context.getString(R.string.image_description));
-    } else if (role.equals(AccessibilityRole.IMAGEBUTTON)) {
+    } else if (role.equals(ReactAccessibilityDelegate.AccessibilityRole.IMAGEBUTTON)) {
       nodeInfo.setRoleDescription(context.getString(R.string.imagebutton_description));
       nodeInfo.setClickable(true);
-    } else if (role.equals(AccessibilityRole.BUTTON)) {
+    } else if (role.equals(ReactAccessibilityDelegate.AccessibilityRole.BUTTON)) {
       nodeInfo.setClickable(true);
-    } else if (role.equals(AccessibilityRole.TOGGLEBUTTON)) {
+    } else if (role.equals(ReactAccessibilityDelegate.AccessibilityRole.TOGGLEBUTTON)) {
       nodeInfo.setClickable(true);
       nodeInfo.setCheckable(true);
-    } else if (role.equals(AccessibilityRole.SUMMARY)) {
+    } else if (role.equals(ReactAccessibilityDelegate.AccessibilityRole.SUMMARY)) {
       nodeInfo.setRoleDescription(context.getString(R.string.summary_description));
-    } else if (role.equals(AccessibilityRole.HEADER)) {
+    } else if (role.equals(ReactAccessibilityDelegate.AccessibilityRole.HEADER)) {
       final AccessibilityNodeInfoCompat.CollectionItemInfoCompat itemInfo =
           AccessibilityNodeInfoCompat.CollectionItemInfoCompat.obtain(0, 1, 0, 1, true);
       nodeInfo.setCollectionItemInfo(itemInfo);
-    } else if (role.equals(AccessibilityRole.ALERT)) {
+    } else if (role.equals(ReactAccessibilityDelegate.AccessibilityRole.ALERT)) {
       nodeInfo.setRoleDescription(context.getString(R.string.alert_description));
-    } else if (role.equals(AccessibilityRole.COMBOBOX)) {
+    } else if (role.equals(ReactAccessibilityDelegate.AccessibilityRole.COMBOBOX)) {
       nodeInfo.setRoleDescription(context.getString(R.string.combobox_description));
-    } else if (role.equals(AccessibilityRole.MENU)) {
+    } else if (role.equals(ReactAccessibilityDelegate.AccessibilityRole.MENU)) {
       nodeInfo.setRoleDescription(context.getString(R.string.menu_description));
-    } else if (role.equals(AccessibilityRole.MENUBAR)) {
+    } else if (role.equals(ReactAccessibilityDelegate.AccessibilityRole.MENUBAR)) {
       nodeInfo.setRoleDescription(context.getString(R.string.menubar_description));
-    } else if (role.equals(AccessibilityRole.MENUITEM)) {
+    } else if (role.equals(ReactAccessibilityDelegate.AccessibilityRole.MENUITEM)) {
       nodeInfo.setRoleDescription(context.getString(R.string.menuitem_description));
-    } else if (role.equals(AccessibilityRole.PROGRESSBAR)) {
+    } else if (role.equals(ReactAccessibilityDelegate.AccessibilityRole.PROGRESSBAR)) {
       nodeInfo.setRoleDescription(context.getString(R.string.progressbar_description));
-    } else if (role.equals(AccessibilityRole.RADIOGROUP)) {
+    } else if (role.equals(ReactAccessibilityDelegate.AccessibilityRole.RADIOGROUP)) {
       nodeInfo.setRoleDescription(context.getString(R.string.radiogroup_description));
-    } else if (role.equals(AccessibilityRole.SCROLLBAR)) {
+    } else if (role.equals(ReactAccessibilityDelegate.AccessibilityRole.SCROLLBAR)) {
       nodeInfo.setRoleDescription(context.getString(R.string.scrollbar_description));
-    } else if (role.equals(AccessibilityRole.SPINBUTTON)) {
+    } else if (role.equals(ReactAccessibilityDelegate.AccessibilityRole.SPINBUTTON)) {
       nodeInfo.setRoleDescription(context.getString(R.string.spinbutton_description));
-    } else if (role.equals(AccessibilityRole.TAB)) {
+    } else if (role.equals(ReactAccessibilityDelegate.AccessibilityRole.TAB)) {
       nodeInfo.setRoleDescription(context.getString(R.string.rn_tab_description));
-    } else if (role.equals(AccessibilityRole.TABLIST)) {
+    } else if (role.equals(ReactAccessibilityDelegate.AccessibilityRole.TABLIST)) {
       nodeInfo.setRoleDescription(context.getString(R.string.tablist_description));
-    } else if (role.equals(AccessibilityRole.TIMER)) {
+    } else if (role.equals(ReactAccessibilityDelegate.AccessibilityRole.TIMER)) {
       nodeInfo.setRoleDescription(context.getString(R.string.timer_description));
-    } else if (role.equals(AccessibilityRole.TOOLBAR)) {
+    } else if (role.equals(ReactAccessibilityDelegate.AccessibilityRole.TOOLBAR)) {
       nodeInfo.setRoleDescription(context.getString(R.string.toolbar_description));
     }
   }
@@ -554,7 +457,7 @@ public class ReactTextAccessibilityDelegate extends ExploreByTouchHelper {
     node.addAction(AccessibilityNodeInfoCompat.ACTION_CLICK);
     node.setBoundsInParent(getBoundsInParent(accessibleTextSpan));
     node.setRoleDescription(mView.getResources().getString(R.string.link_description));
-    node.setClassName(AccessibilityRole.getValue(AccessibilityRole.BUTTON));
+    node.setClassName(ReactAccessibilityDelegate.AccessibilityRole.getValue(ReactAccessibilityDelegate.AccessibilityRole.BUTTON));
   }
 
   private Rect getBoundsInParent(AccessibilityLinks.AccessibleLink accessibleLink) {
