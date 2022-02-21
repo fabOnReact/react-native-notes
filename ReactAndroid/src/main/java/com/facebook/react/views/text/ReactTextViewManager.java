@@ -7,9 +7,12 @@
 
 package com.facebook.react.views.text;
 
+import android.view.View;
+import androidx.annotation.NonNull;
 import android.content.Context;
 import android.text.Spannable;
 import androidx.annotation.Nullable;
+import com.facebook.common.logging.FLog;
 import com.facebook.react.R;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableNativeMap;
@@ -19,7 +22,7 @@ import com.facebook.react.common.mapbuffer.ReadableMapBuffer;
 import com.facebook.react.config.ReactFeatureFlags;
 import com.facebook.react.module.annotations.ReactModule;
 import com.facebook.react.uimanager.IViewManagerWithChildren;
-import com.facebook.react.uimanager.ReactAccessibilityDelegate;
+import com.facebook.react.uimanager.ReactTextAccessibilityDelegate;
 import com.facebook.react.uimanager.ReactStylesDiffMap;
 import com.facebook.react.uimanager.StateWrapper;
 import com.facebook.react.uimanager.ThemedReactContext;
@@ -73,11 +76,23 @@ public class ReactTextViewManager
     if (clickableSpans.length > 0) {
       view.setTag(
           R.id.accessibility_links,
-          new ReactAccessibilityDelegate.AccessibilityLinks(clickableSpans, spannable));
-      ReactAccessibilityDelegate.resetDelegate(
+          new ReactTextAccessibilityDelegate.AccessibilityLinks(clickableSpans, spannable));
+      ReactTextAccessibilityDelegate.resetDelegate(
           view, view.isFocusable(), view.getImportantForAccessibility());
     }
   }
+
+  @Override
+  protected void onAfterUpdateTransaction(@NonNull ReactTextView view) {
+    super.onAfterUpdateTransaction(view);
+    updateViewAccessibility(view);
+  }
+
+  private void updateViewAccessibility(@NonNull View view) {
+     ReactTextAccessibilityDelegate.setDelegate(
+         view, view.isFocusable(), view.getImportantForAccessibility());
+  }
+
 
   @Override
   public ReactTextShadowNode createShadowNodeInstance() {
@@ -92,12 +107,6 @@ public class ReactTextViewManager
   @Override
   public Class<ReactTextShadowNode> getShadowNodeClass() {
     return ReactTextShadowNode.class;
-  }
-
-  @Override
-  protected void onAfterUpdateTransaction(ReactTextView view) {
-    super.onAfterUpdateTransaction(view);
-    view.updateView();
   }
 
   public boolean needsCustomLayoutForChildren() {

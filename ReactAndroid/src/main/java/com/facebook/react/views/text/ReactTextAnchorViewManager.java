@@ -7,6 +7,8 @@
 
 package com.facebook.react.views.text;
 
+import com.facebook.react.uimanager.ReactTextAccessibilityDelegate;
+import androidx.annotation.NonNull;
 import android.os.Build;
 import android.text.Layout;
 import android.text.Spannable;
@@ -211,6 +213,17 @@ public abstract class ReactTextAnchorViewManager<T extends View, C extends React
         view.setLinkifyMask(0);
         break;
     }
+  }
+
+  @Override
+  protected void onAfterUpdateTransaction(@NonNull T view) {
+    super.onAfterUpdateTransaction(view);
+    updateViewAccessibility(view);
+  }
+
+  private void updateViewAccessibility(@NonNull T view) {
+     ReactTextAccessibilityDelegate.setDelegate(
+         view, view.isFocusable(), view.getImportantForAccessibility());
   }
 
   @ReactProp(name = "onInlineViewLayout")
