@@ -80,10 +80,6 @@ public class ReactTextAccessibilityDelegate extends ExploreByTouchHelper {
 
   // State constants for states which have analogs in AccessibilityNodeInfo
 
-  private static final String STATE_DISABLED = "disabled";
-  private static final String STATE_SELECTED = "selected";
-  private static final String STATE_CHECKED = "checked";
-
   public ReactTextAccessibilityDelegate(
       final View view, boolean originalFocus, int originalImportantForAccessibility) {
     super(view);
