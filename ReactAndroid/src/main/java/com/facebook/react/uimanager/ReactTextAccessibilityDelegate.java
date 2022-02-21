@@ -25,25 +25,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
-import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.AccessibilityActionCompat;
-import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.RangeInfoCompat;
 import androidx.customview.widget.ExploreByTouchHelper;
 import com.facebook.react.R;
-import com.facebook.react.bridge.Arguments;
-import com.facebook.react.bridge.Dynamic;
-import com.facebook.react.bridge.ReactContext;
-import com.facebook.react.bridge.ReactNoCrashSoftException;
-import com.facebook.react.bridge.ReactSoftExceptionLogger;
-import com.facebook.react.bridge.ReadableArray;
-import com.facebook.react.bridge.ReadableMap;
-import com.facebook.react.bridge.ReadableMapKeySetIterator;
-import com.facebook.react.bridge.ReadableType;
-import com.facebook.react.bridge.UIManager;
-import com.facebook.react.bridge.WritableMap;
-import com.facebook.react.uimanager.events.Event;
-import com.facebook.react.uimanager.events.EventDispatcher;
 import java.util.ArrayList;
-import com.facebook.react.uimanager.util.ReactFindViewUtil;
 import java.util.HashMap;
 import java.util.List;
 
@@ -110,7 +94,9 @@ public class ReactTextAccessibilityDelegate extends ExploreByTouchHelper {
   // TODO: Eventually support for other languages on talkback
 
   public static void setRole(
-      AccessibilityNodeInfoCompat nodeInfo, ReactAccessibilityDelegate.AccessibilityRole role, final Context context) {
+      AccessibilityNodeInfoCompat nodeInfo,
+      ReactAccessibilityDelegate.AccessibilityRole role,
+      final Context context) {
     if (role == null) {
       role = ReactAccessibilityDelegate.AccessibilityRole.NONE;
     }
@@ -133,7 +119,8 @@ public class ReactTextAccessibilityDelegate extends ExploreByTouchHelper {
             || view.getTag(R.id.accessibility_links) != null)) {
       ViewCompat.setAccessibilityDelegate(
           view,
-          new ReactTextAccessibilityDelegate(view, originalFocus, originalImportantForAccessibility));
+          new ReactTextAccessibilityDelegate(
+              view, originalFocus, originalImportantForAccessibility));
     }
   }
 
@@ -219,7 +206,9 @@ public class ReactTextAccessibilityDelegate extends ExploreByTouchHelper {
     node.addAction(AccessibilityNodeInfoCompat.ACTION_CLICK);
     node.setBoundsInParent(getBoundsInParent(accessibleTextSpan));
     node.setRoleDescription(mView.getResources().getString(R.string.link_description));
-    node.setClassName(ReactAccessibilityDelegate.AccessibilityRole.getValue(ReactAccessibilityDelegate.AccessibilityRole.BUTTON));
+    node.setClassName(
+        ReactAccessibilityDelegate.AccessibilityRole.getValue(
+            ReactAccessibilityDelegate.AccessibilityRole.BUTTON));
   }
 
   private Rect getBoundsInParent(AccessibilityLinks.AccessibleLink accessibleLink) {
