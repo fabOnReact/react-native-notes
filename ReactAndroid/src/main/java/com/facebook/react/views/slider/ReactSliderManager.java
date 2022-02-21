@@ -7,7 +7,6 @@
 
 package com.facebook.react.views.slider;
 
-import androidx.core.view.AccessibilityDelegateCompat;
 import android.content.Context;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
@@ -310,7 +309,7 @@ public class ReactSliderManager extends SimpleViewManager<ReactSlider>
     return mDelegate;
   }
 
-  protected class ReactSliderAccessibilityDelegate extends AccessibilityDelegateCompat {
+  protected class ReactSliderAccessibilityDelegate extends ReactAccessibilityDelegate {
     private boolean isSliderAction(int action) {
       return (action == AccessibilityActionCompat.ACTION_SCROLL_FORWARD.getId())
           || (action == AccessibilityActionCompat.ACTION_SCROLL_BACKWARD.getId())
