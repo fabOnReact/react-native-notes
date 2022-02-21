@@ -303,48 +303,6 @@ public class ReactTextAccessibilityDelegate extends ExploreByTouchHelper {
     nodeInfo.setClassName(ReactAccessibilityDelegate.AccessibilityRole.getValue(role));
     if (role.equals(ReactAccessibilityDelegate.AccessibilityRole.LINK)) {
       nodeInfo.setRoleDescription(context.getString(R.string.link_description));
-    } else if (role.equals(ReactAccessibilityDelegate.AccessibilityRole.IMAGE)) {
-      nodeInfo.setRoleDescription(context.getString(R.string.image_description));
-    } else if (role.equals(ReactAccessibilityDelegate.AccessibilityRole.IMAGEBUTTON)) {
-      nodeInfo.setRoleDescription(context.getString(R.string.imagebutton_description));
-      nodeInfo.setClickable(true);
-    } else if (role.equals(ReactAccessibilityDelegate.AccessibilityRole.BUTTON)) {
-      nodeInfo.setClickable(true);
-    } else if (role.equals(ReactAccessibilityDelegate.AccessibilityRole.TOGGLEBUTTON)) {
-      nodeInfo.setClickable(true);
-      nodeInfo.setCheckable(true);
-    } else if (role.equals(ReactAccessibilityDelegate.AccessibilityRole.SUMMARY)) {
-      nodeInfo.setRoleDescription(context.getString(R.string.summary_description));
-    } else if (role.equals(ReactAccessibilityDelegate.AccessibilityRole.HEADER)) {
-      final AccessibilityNodeInfoCompat.CollectionItemInfoCompat itemInfo =
-          AccessibilityNodeInfoCompat.CollectionItemInfoCompat.obtain(0, 1, 0, 1, true);
-      nodeInfo.setCollectionItemInfo(itemInfo);
-    } else if (role.equals(ReactAccessibilityDelegate.AccessibilityRole.ALERT)) {
-      nodeInfo.setRoleDescription(context.getString(R.string.alert_description));
-    } else if (role.equals(ReactAccessibilityDelegate.AccessibilityRole.COMBOBOX)) {
-      nodeInfo.setRoleDescription(context.getString(R.string.combobox_description));
-    } else if (role.equals(ReactAccessibilityDelegate.AccessibilityRole.MENU)) {
-      nodeInfo.setRoleDescription(context.getString(R.string.menu_description));
-    } else if (role.equals(ReactAccessibilityDelegate.AccessibilityRole.MENUBAR)) {
-      nodeInfo.setRoleDescription(context.getString(R.string.menubar_description));
-    } else if (role.equals(ReactAccessibilityDelegate.AccessibilityRole.MENUITEM)) {
-      nodeInfo.setRoleDescription(context.getString(R.string.menuitem_description));
-    } else if (role.equals(ReactAccessibilityDelegate.AccessibilityRole.PROGRESSBAR)) {
-      nodeInfo.setRoleDescription(context.getString(R.string.progressbar_description));
-    } else if (role.equals(ReactAccessibilityDelegate.AccessibilityRole.RADIOGROUP)) {
-      nodeInfo.setRoleDescription(context.getString(R.string.radiogroup_description));
-    } else if (role.equals(ReactAccessibilityDelegate.AccessibilityRole.SCROLLBAR)) {
-      nodeInfo.setRoleDescription(context.getString(R.string.scrollbar_description));
-    } else if (role.equals(ReactAccessibilityDelegate.AccessibilityRole.SPINBUTTON)) {
-      nodeInfo.setRoleDescription(context.getString(R.string.spinbutton_description));
-    } else if (role.equals(ReactAccessibilityDelegate.AccessibilityRole.TAB)) {
-      nodeInfo.setRoleDescription(context.getString(R.string.rn_tab_description));
-    } else if (role.equals(ReactAccessibilityDelegate.AccessibilityRole.TABLIST)) {
-      nodeInfo.setRoleDescription(context.getString(R.string.tablist_description));
-    } else if (role.equals(ReactAccessibilityDelegate.AccessibilityRole.TIMER)) {
-      nodeInfo.setRoleDescription(context.getString(R.string.timer_description));
-    } else if (role.equals(ReactAccessibilityDelegate.AccessibilityRole.TOOLBAR)) {
-      nodeInfo.setRoleDescription(context.getString(R.string.toolbar_description));
     }
   }
 
