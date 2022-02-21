@@ -268,29 +268,6 @@ public class ReactTextAccessibilityDelegate extends ExploreByTouchHelper {
     return super.performAccessibilityAction(host, action, args);
   }
 
-  private static void setState(
-      AccessibilityNodeInfoCompat info, ReadableMap accessibilityState, Context context) {
-    final ReadableMapKeySetIterator i = accessibilityState.keySetIterator();
-    while (i.hasNextKey()) {
-      final String state = i.nextKey();
-      final Dynamic value = accessibilityState.getDynamic(state);
-      if (state.equals(STATE_SELECTED) && value.getType() == ReadableType.Boolean) {
-        info.setSelected(value.asBoolean());
-      } else if (state.equals(STATE_DISABLED) && value.getType() == ReadableType.Boolean) {
-        info.setEnabled(!value.asBoolean());
-      } else if (state.equals(STATE_CHECKED) && value.getType() == ReadableType.Boolean) {
-        final boolean boolValue = value.asBoolean();
-        info.setCheckable(true);
-        info.setChecked(boolValue);
-        if (info.getClassName().equals(ReactAccessibilityDelegate.AccessibilityRole.getValue(ReactAccessibilityDelegate.AccessibilityRole.SWITCH))) {
-          info.setText(
-              context.getString(
-                  boolValue ? R.string.state_on_description : R.string.state_off_description));
-        }
-      }
-    }
-  }
-
   /** Strings for setting the Role Description in english */
 
   // TODO: Eventually support for other languages on talkback
