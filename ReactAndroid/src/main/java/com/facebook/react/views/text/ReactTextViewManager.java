@@ -84,7 +84,6 @@ public class ReactTextViewManager
 
   @Override
   protected void onAfterUpdateTransaction(@NonNull ReactTextView view) {
-    super.onAfterUpdateTransaction(view);
     updateViewAccessibility(view);
   }
 

@@ -217,7 +217,6 @@ public abstract class ReactTextAnchorViewManager<T extends View, C extends React
 
   @Override
   protected void onAfterUpdateTransaction(@NonNull T view) {
-    super.onAfterUpdateTransaction(view);
     updateViewAccessibility(view);
   }
 
