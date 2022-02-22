@@ -7,7 +7,6 @@
 
 package com.facebook.react.uimanager;
 
-import android.content.Context;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.os.Bundle;
@@ -25,8 +24,24 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
+import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.AccessibilityActionCompat;
+import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.RangeInfoCompat;
 import androidx.customview.widget.ExploreByTouchHelper;
 import com.facebook.react.R;
+import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.Dynamic;
+import com.facebook.react.bridge.ReactContext;
+import com.facebook.react.bridge.ReactNoCrashSoftException;
+import com.facebook.react.bridge.ReactSoftExceptionLogger;
+import com.facebook.react.bridge.ReadableArray;
+import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.ReadableType;
+import com.facebook.react.bridge.UIManager;
+import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.uimanager.ReactAccessibilityDelegate.AccessibilityRole;
+import com.facebook.react.uimanager.events.Event;
+import com.facebook.react.uimanager.events.EventDispatcher;
+import com.facebook.react.uimanager.util.ReactFindViewUtil;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -89,22 +104,168 @@ public class ReactTextAccessibilityDelegate extends ExploreByTouchHelper {
 
   @Nullable View mAccessibilityLabelledBy;
 
+  @Override
+  public void onInitializeAccessibilityNodeInfo(View host, AccessibilityNodeInfoCompat info) {
+    super.onInitializeAccessibilityNodeInfo(host, info);
+    final AccessibilityRole accessibilityRole =
+        (AccessibilityRole) host.getTag(R.id.accessibility_role);
+    if (accessibilityRole != null) {
+      ReactAccessibilityDelegate.setRole(info, accessibilityRole, host.getContext());
+    }
+
+    final Object accessibilityLabelledBy = host.getTag(R.id.labelled_by);
+    if (accessibilityLabelledBy != null) {
+      mAccessibilityLabelledBy =
+          ReactFindViewUtil.findView(host.getRootView(), (String) accessibilityLabelledBy);
+      if (mAccessibilityLabelledBy != null) {
+        info.setLabeledBy(mAccessibilityLabelledBy);
+      }
+    }
+
+    // state is changeable.
+    final ReadableMap accessibilityState = (ReadableMap) host.getTag(R.id.accessibility_state);
+    if (accessibilityState != null) {
+      ReactAccessibilityDelegate.setState(info, accessibilityState, host.getContext());
+    }
+    final ReadableArray accessibilityActions =
+        (ReadableArray) host.getTag(R.id.accessibility_actions);
+    if (accessibilityActions != null) {
+      for (int i = 0; i < accessibilityActions.size(); i++) {
+        final ReadableMap action = accessibilityActions.getMap(i);
+        if (!action.hasKey("name")) {
+          throw new IllegalArgumentException("Unknown accessibility action.");
+        }
+        int actionId = sCounter;
+        String actionLabel = action.hasKey("label") ? action.getString("label") : null;
+        if (ReactAccessibilityDelegate.sActionIdMap.containsKey(action.getString("name"))) {
+          actionId = ReactAccessibilityDelegate.sActionIdMap.get(action.getString("name"));
+        } else {
+          sCounter++;
+        }
+        mAccessibilityActionsMap.put(actionId, action.getString("name"));
+        final AccessibilityActionCompat accessibilityAction =
+            new AccessibilityActionCompat(actionId, actionLabel);
+        info.addAction(accessibilityAction);
+      }
+    }
+
+    // Process accessibilityValue
+
+    final ReadableMap accessibilityValue = (ReadableMap) host.getTag(R.id.accessibility_value);
+    if (accessibilityValue != null
+        && accessibilityValue.hasKey("min")
+        && accessibilityValue.hasKey("now")
+        && accessibilityValue.hasKey("max")) {
+      final Dynamic minDynamic = accessibilityValue.getDynamic("min");
+      final Dynamic nowDynamic = accessibilityValue.getDynamic("now");
+      final Dynamic maxDynamic = accessibilityValue.getDynamic("max");
+      if (minDynamic != null
+          && minDynamic.getType() == ReadableType.Number
+          && nowDynamic != null
+          && nowDynamic.getType() == ReadableType.Number
+          && maxDynamic != null
+          && maxDynamic.getType() == ReadableType.Number) {
+        final int min = minDynamic.asInt();
+        final int now = nowDynamic.asInt();
+        final int max = maxDynamic.asInt();
+        if (max > min && now >= min && max >= now) {
+          info.setRangeInfo(RangeInfoCompat.obtain(RangeInfoCompat.RANGE_TYPE_INT, min, max, now));
+        }
+      }
+    }
+
+    // Expose the testID prop as the resource-id name of the view. Black-box E2E/UI testing
+    // frameworks, which interact with the UI through the accessibility framework, do not have
+    // access to view tags. This allows developers/testers to avoid polluting the
+    // content-description with test identifiers.
+    final String testId = (String) host.getTag(R.id.react_test_id);
+    if (testId != null) {
+      info.setViewIdResourceName(testId);
+    }
+  }
+
+  @Override
+  public void onInitializeAccessibilityEvent(View host, AccessibilityEvent event) {
+    super.onInitializeAccessibilityEvent(host, event);
+    // Set item count and current item index on accessibility events for adjustable
+    // in order to make Talkback announce the value of the adjustable
+    final ReadableMap accessibilityValue = (ReadableMap) host.getTag(R.id.accessibility_value);
+    if (accessibilityValue != null
+        && accessibilityValue.hasKey("min")
+        && accessibilityValue.hasKey("now")
+        && accessibilityValue.hasKey("max")) {
+      final Dynamic minDynamic = accessibilityValue.getDynamic("min");
+      final Dynamic nowDynamic = accessibilityValue.getDynamic("now");
+      final Dynamic maxDynamic = accessibilityValue.getDynamic("max");
+      if (minDynamic != null
+          && minDynamic.getType() == ReadableType.Number
+          && nowDynamic != null
+          && nowDynamic.getType() == ReadableType.Number
+          && maxDynamic != null
+          && maxDynamic.getType() == ReadableType.Number) {
+        final int min = minDynamic.asInt();
+        final int now = nowDynamic.asInt();
+        final int max = maxDynamic.asInt();
+        if (max > min && now >= min && max >= now) {
+          event.setItemCount(max - min);
+          event.setCurrentItemIndex(now);
+        }
+      }
+    }
+  }
+
+  @Override
+  public boolean performAccessibilityAction(View host, int action, Bundle args) {
+    if (mAccessibilityActionsMap.containsKey(action)) {
+      final WritableMap event = Arguments.createMap();
+      event.putString("actionName", mAccessibilityActionsMap.get(action));
+      ReactContext reactContext = (ReactContext) host.getContext();
+      if (reactContext.hasActiveReactInstance()) {
+        final int reactTag = host.getId();
+        final int surfaceId = UIManagerHelper.getSurfaceId(reactContext);
+        UIManager uiManager = UIManagerHelper.getUIManager(reactContext, reactTag);
+        if (uiManager != null) {
+          uiManager
+              .<EventDispatcher>getEventDispatcher()
+              .dispatchEvent(
+                  new Event(surfaceId, reactTag) {
+                    @Override
+                    public String getEventName() {
+                      return ReactAccessibilityDelegate.TOP_ACCESSIBILITY_ACTION_EVENT;
+                    }
+
+                    @Override
+                    protected WritableMap getEventData() {
+                      return event;
+                    }
+                  });
+        }
+      } else {
+        ReactSoftExceptionLogger.logSoftException(
+            TAG, new ReactNoCrashSoftException("Cannot get RCTEventEmitter, no CatalystInstance"));
+      }
+
+      // In order to make Talkback announce the change of the adjustable's value,
+      // schedule to send a TYPE_VIEW_SELECTED event after performing the scroll actions.
+      final AccessibilityRole accessibilityRole =
+          (AccessibilityRole) host.getTag(R.id.accessibility_role);
+      final ReadableMap accessibilityValue = (ReadableMap) host.getTag(R.id.accessibility_value);
+      if (accessibilityRole == AccessibilityRole.ADJUSTABLE
+          && (action == AccessibilityActionCompat.ACTION_SCROLL_FORWARD.getId()
+              || action == AccessibilityActionCompat.ACTION_SCROLL_BACKWARD.getId())) {
+        if (accessibilityValue != null && !accessibilityValue.hasKey("text")) {
+          scheduleAccessibilityEventSender(host);
+        }
+        return super.performAccessibilityAction(host, action, args);
+      }
+      return true;
+    }
+    return super.performAccessibilityAction(host, action, args);
+  }
+
   /** Strings for setting the Role Description in english */
 
   // TODO: Eventually support for other languages on talkback
-
-  public static void setRole(
-      AccessibilityNodeInfoCompat nodeInfo,
-      ReactAccessibilityDelegate.AccessibilityRole role,
-      final Context context) {
-    if (role == null) {
-      role = ReactAccessibilityDelegate.AccessibilityRole.NONE;
-    }
-    nodeInfo.setClassName(ReactAccessibilityDelegate.AccessibilityRole.getValue(role));
-    if (role.equals(ReactAccessibilityDelegate.AccessibilityRole.LINK)) {
-      nodeInfo.setRoleDescription(context.getString(R.string.link_description));
-    }
-  }
 
   public static void setDelegate(
       final View view, boolean originalFocus, int originalImportantForAccessibility) {

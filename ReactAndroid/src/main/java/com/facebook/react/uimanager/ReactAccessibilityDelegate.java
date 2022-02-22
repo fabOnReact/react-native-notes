@@ -353,7 +353,7 @@ public class ReactAccessibilityDelegate extends AccessibilityDelegateCompat {
     return super.performAccessibilityAction(host, action, args);
   }
 
-  private static void setState(
+  protected static void setState(
       AccessibilityNodeInfoCompat info, ReadableMap accessibilityState, Context context) {
     final ReadableMapKeySetIterator i = accessibilityState.keySetIterator();
     while (i.hasNextKey()) {
