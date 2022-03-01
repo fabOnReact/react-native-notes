@@ -12,7 +12,6 @@ import android.text.Spannable;
 import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import com.facebook.react.R;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableNativeMap;
 import com.facebook.react.common.MapBuilder;
@@ -69,16 +68,23 @@ public class ReactTextViewManager
 
     // If this text view contains any clickable spans, set a view tag and reset the accessibility
     // delegate so that these can be picked up by the accessibility system.
+    /*
     ReactClickableSpan[] clickableSpans =
         spannable.getSpans(0, update.getText().length(), ReactClickableSpan.class);
+        */
 
+    /*
     if (clickableSpans.length > 0) {
+      Log.w(
+          "TESTING::ReactTextViewManager",
+          "view.mAccessibilityLinks: " + (view.mAccessibilityLinks));
       view.setTag(
           R.id.accessibility_links,
           new ReactTextAccessibilityDelegate.AccessibilityLinks(clickableSpans, spannable));
       ReactTextAccessibilityDelegate.resetDelegate(
           view, view.isFocusable(), view.getImportantForAccessibility());
     }
+    */
   }
 
   @Override

@@ -13,11 +13,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.text.Layout;
-import android.text.Spannable;
 import android.text.Spanned;
 import android.text.style.AbsoluteSizeSpan;
 import android.text.style.ClickableSpan;
-import android.util.Log;
 import android.view.View;
 import android.view.accessibility.AccessibilityEvent;
 import android.widget.TextView;
@@ -44,7 +42,7 @@ import com.facebook.react.uimanager.events.Event;
 import com.facebook.react.uimanager.events.EventDispatcher;
 import com.facebook.react.uimanager.util.ReactFindViewUtil;
 import com.facebook.react.views.text.ReactTextView;
-import java.util.ArrayList;
+import com.facebook.react.views.text.ReactTextView.AccessibilityLinks;
 import java.util.HashMap;
 import java.util.List;
 
@@ -60,7 +58,7 @@ public class ReactTextAccessibilityDelegate extends ExploreByTouchHelper {
   private static final int SEND_EVENT = 1;
 
   private final View mView;
-  private final AccessibilityLinks mAccessibilityLinks;
+  public ReactTextView.AccessibilityLinks mAccessibilityLinks;
 
   private Handler mHandler;
 
@@ -101,19 +99,10 @@ public class ReactTextAccessibilityDelegate extends ExploreByTouchHelper {
     // announcement coalescing.
     if (mView instanceof ReactTextView) {
       ReactTextView textView = (ReactTextView) mView;
-      Log.w(
-          "TESTING::ReactTextAccessibilityDelegate",
-          "textView.getClickableSpans(): " + (textView.getClickableSpans()));
-      /*
-      Log.w("TESTING::ReactTextAccessibilityDelegate", "mView: " + (mView));
-      Log.w(
-          "TESTING::ReactTextAccessibilityDelegate",
-          "mView.getSpanned(): " + (((ReactTextView) mView).getSpanned()));
-          */
+      mView.setFocusable(originalFocus);
+      ViewCompat.setImportantForAccessibility(mView, originalImportantForAccessibility);
+      mAccessibilityLinks = ((ReactTextView) mView).getAccessibilityLinks();
     }
-    mView.setFocusable(originalFocus);
-    ViewCompat.setImportantForAccessibility(mView, originalImportantForAccessibility);
-    mAccessibilityLinks = (AccessibilityLinks) mView.getTag(R.id.accessibility_links);
   }
 
   @Nullable View mAccessibilityLabelledBy;
@@ -447,70 +436,5 @@ public class ReactTextAccessibilityDelegate extends ExploreByTouchHelper {
     Spanned spanned = (Spanned) ((TextView) mView).getText();
     T[] spans = spanned.getSpans(start, end, classType);
     return spans.length > 0 ? spans[0] : null;
-  }
-
-  public static class AccessibilityLinks {
-    private final List<AccessibleLink> mLinks;
-
-    public AccessibilityLinks(ClickableSpan[] spans, Spannable text) {
-      ArrayList<AccessibleLink> links = new ArrayList<>();
-      for (int i = 0; i < spans.length; i++) {
-        ClickableSpan span = spans[i];
-        int start = text.getSpanStart(span);
-        int end = text.getSpanEnd(span);
-        // zero length spans, and out of range spans should not be included.
-        if (start == end || start < 0 || end < 0 || start > text.length() || end > text.length()) {
-          continue;
-        }
-
-        final AccessibleLink link = new AccessibleLink();
-        link.description = text.subSequence(start, end).toString();
-        link.start = start;
-        link.end = end;
-
-        // ID is the reverse of what is expected, since the ClickableSpans are returned in reverse
-        // order due to being added in reverse order. If we don't do this, focus will move to the
-        // last link first and move backwards.
-        //
-        // If this approach becomes unreliable, we should instead look at their start position and
-        // order them manually.
-        link.id = spans.length - 1 - i;
-        links.add(link);
-      }
-      mLinks = links;
-    }
-
-    @Nullable
-    public AccessibleLink getLinkById(int id) {
-      for (AccessibleLink link : mLinks) {
-        if (link.id == id) {
-          return link;
-        }
-      }
-
-      return null;
-    }
-
-    @Nullable
-    public AccessibleLink getLinkBySpanPos(int start, int end) {
-      for (AccessibleLink link : mLinks) {
-        if (link.start == start && link.end == end) {
-          return link;
-        }
-      }
-
-      return null;
-    }
-
-    public int size() {
-      return mLinks.size();
-    }
-
-    private static class AccessibleLink {
-      public String description;
-      public int start;
-      public int end;
-      public int id;
-    }
   }
 }

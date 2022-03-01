@@ -40,6 +40,7 @@ import com.facebook.react.common.ReactConstants;
 import com.facebook.react.config.ReactFeatureFlags;
 import com.facebook.react.uimanager.PixelUtil;
 import com.facebook.react.uimanager.ReactCompoundView;
+import com.facebook.react.uimanager.ReactTextAccessibilityDelegate;
 import com.facebook.react.uimanager.UIManagerModule;
 import com.facebook.react.uimanager.ViewDefaults;
 import com.facebook.react.uimanager.common.UIManagerType;
@@ -68,7 +69,7 @@ public class ReactTextView extends AppCompatTextView implements ReactCompoundVie
 
   private ReactViewBackgroundManager mReactBackgroundManager;
   private Spannable mSpanned;
-  private AccessibilityLinks mAccessibilityLinks;
+  public AccessibilityLinks mAccessibilityLinks;
 
   public ReactTextView(Context context) {
     super(context);
@@ -341,7 +342,13 @@ public class ReactTextView extends AppCompatTextView implements ReactCompoundVie
       Log.w("TESTING::ReactTextView", "now set this links in ReactTextView");
       mAccessibilityLinks = new AccessibilityLinks(getClickableSpans(), update.getText());
       Log.w("TESTING::ReactTextView", "mAccessibilityLinks: " + (mAccessibilityLinks));
+      ReactTextAccessibilityDelegate.resetDelegate(
+          this, this.isFocusable(), this.getImportantForAccessibility());
     }
+  }
+
+  public AccessibilityLinks getAccessibilityLinks() {
+    return mAccessibilityLinks;
   }
 
   @Override
@@ -659,7 +666,7 @@ public class ReactTextView extends AppCompatTextView implements ReactCompoundVie
       return mLinks.size();
     }
 
-    private static class AccessibleLink {
+    public static class AccessibleLink {
       public String description;
       public int start;
       public int end;
