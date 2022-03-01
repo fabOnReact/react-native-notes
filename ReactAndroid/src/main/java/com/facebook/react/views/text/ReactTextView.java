@@ -19,7 +19,6 @@ import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.text.util.Linkify;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -29,6 +28,7 @@ import androidx.appcompat.widget.AppCompatTextView;
 import androidx.appcompat.widget.TintContextWrapper;
 import androidx.core.view.AccessibilityDelegateCompat;
 import androidx.core.view.ViewCompat;
+import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
 import androidx.customview.widget.ExploreByTouchHelper;
 import com.facebook.common.logging.FLog;
 import com.facebook.infer.annotation.Assertions;
@@ -338,10 +338,10 @@ public class ReactTextView extends AppCompatTextView implements ReactCompoundVie
     // Ensure onLayout is called so the inline views can be repositioned.
     requestLayout();
 
-    if (getClickableSpans().length > 0) {
-      Log.w("TESTING::ReactTextView", "now set this links in ReactTextView");
-      mAccessibilityLinks = new AccessibilityLinks(getClickableSpans(), update.getText());
-      Log.w("TESTING::ReactTextView", "mAccessibilityLinks: " + (mAccessibilityLinks));
+    ClickableSpan[] clickableSpans =
+        AccessibilityNodeInfoCompat.getClickableSpans(update.getText());
+    if (clickableSpans.length > 0) {
+      mAccessibilityLinks = new AccessibilityLinks(clickableSpans, update.getText());
       ReactTextAccessibilityDelegate.resetDelegate(
           this, this.isFocusable(), this.getImportantForAccessibility());
     }
@@ -580,14 +580,13 @@ public class ReactTextView extends AppCompatTextView implements ReactCompoundVie
     return mSpanned;
   }
 
+  /*
   public ReactClickableSpan[] getClickableSpans() {
     ReactClickableSpan[] clickableSpans =
         mSpanned.getSpans(0, getText().length(), ReactClickableSpan.class);
-    /*
-    Log.w("TESTING::ReactTextView", "clickableSpans.length: " + (clickableSpans.length));
-    */
     return clickableSpans;
   }
+  */
 
   public void setLinkifyMask(int mask) {
     mLinkifyMaskType = mask;
