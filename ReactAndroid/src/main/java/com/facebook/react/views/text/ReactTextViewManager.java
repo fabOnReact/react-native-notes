@@ -7,12 +7,11 @@
 
 package com.facebook.react.views.text;
 
-import android.view.View;
-import androidx.annotation.NonNull;
 import android.content.Context;
 import android.text.Spannable;
+import android.view.View;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import com.facebook.common.logging.FLog;
 import com.facebook.react.R;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableNativeMap;
@@ -22,8 +21,8 @@ import com.facebook.react.common.mapbuffer.ReadableMapBuffer;
 import com.facebook.react.config.ReactFeatureFlags;
 import com.facebook.react.module.annotations.ReactModule;
 import com.facebook.react.uimanager.IViewManagerWithChildren;
-import com.facebook.react.uimanager.ReactTextAccessibilityDelegate;
 import com.facebook.react.uimanager.ReactStylesDiffMap;
+import com.facebook.react.uimanager.ReactTextAccessibilityDelegate;
 import com.facebook.react.uimanager.StateWrapper;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.yoga.YogaMeasureMode;
@@ -88,10 +87,9 @@ public class ReactTextViewManager
   }
 
   private void updateViewAccessibility(@NonNull View view) {
-     ReactTextAccessibilityDelegate.setDelegate(
-         view, view.isFocusable(), view.getImportantForAccessibility());
+    ReactTextAccessibilityDelegate.setDelegate(
+        view, view.isFocusable(), view.getImportantForAccessibility());
   }
-
 
   @Override
   public ReactTextShadowNode createShadowNodeInstance() {

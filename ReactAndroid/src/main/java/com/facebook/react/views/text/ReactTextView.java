@@ -17,7 +17,9 @@ import android.text.Spannable;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
 import android.text.util.Linkify;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -46,6 +48,7 @@ import com.facebook.react.views.view.ReactViewBackgroundManager;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
 public class ReactTextView extends AppCompatTextView implements ReactCompoundView {
 
@@ -61,10 +64,11 @@ public class ReactTextView extends AppCompatTextView implements ReactCompoundVie
   private boolean mAdjustsFontSizeToFit = false;
   private int mLinkifyMaskType = 0;
   private boolean mNotifyOnInlineViewLayout;
-  private boolean mTextIsSelectable = false;
+  public boolean mTextIsSelectable = false;
 
   private ReactViewBackgroundManager mReactBackgroundManager;
   private Spannable mSpanned;
+  private AccessibilityLinks mAccessibilityLinks;
 
   public ReactTextView(Context context) {
     super(context);
@@ -332,6 +336,12 @@ public class ReactTextView extends AppCompatTextView implements ReactCompoundVie
 
     // Ensure onLayout is called so the inline views can be repositioned.
     requestLayout();
+
+    if (getClickableSpans().length > 0) {
+      Log.w("TESTING::ReactTextView", "now set this links in ReactTextView");
+      mAccessibilityLinks = new AccessibilityLinks(getClickableSpans(), update.getText());
+      Log.w("TESTING::ReactTextView", "mAccessibilityLinks: " + (mAccessibilityLinks));
+    }
   }
 
   @Override
@@ -563,6 +573,15 @@ public class ReactTextView extends AppCompatTextView implements ReactCompoundVie
     return mSpanned;
   }
 
+  public ReactClickableSpan[] getClickableSpans() {
+    ReactClickableSpan[] clickableSpans =
+        mSpanned.getSpans(0, getText().length(), ReactClickableSpan.class);
+    /*
+    Log.w("TESTING::ReactTextView", "clickableSpans.length: " + (clickableSpans.length));
+    */
+    return clickableSpans;
+  }
+
   public void setLinkifyMask(int mask) {
     mLinkifyMaskType = mask;
   }
@@ -581,5 +600,70 @@ public class ReactTextView extends AppCompatTextView implements ReactCompoundVie
     }
 
     return super.dispatchHoverEvent(event);
+  }
+
+  public static class AccessibilityLinks {
+    private final List<AccessibleLink> mLinks;
+
+    public AccessibilityLinks(ClickableSpan[] spans, Spannable text) {
+      ArrayList<AccessibleLink> links = new ArrayList<>();
+      for (int i = 0; i < spans.length; i++) {
+        ClickableSpan span = spans[i];
+        int start = text.getSpanStart(span);
+        int end = text.getSpanEnd(span);
+        // zero length spans, and out of range spans should not be included.
+        if (start == end || start < 0 || end < 0 || start > text.length() || end > text.length()) {
+          continue;
+        }
+
+        final AccessibleLink link = new AccessibleLink();
+        link.description = text.subSequence(start, end).toString();
+        link.start = start;
+        link.end = end;
+
+        // ID is the reverse of what is expected, since the ClickableSpans are returned in reverse
+        // order due to being added in reverse order. If we don't do this, focus will move to the
+        // last link first and move backwards.
+        //
+        // If this approach becomes unreliable, we should instead look at their start position and
+        // order them manually.
+        link.id = spans.length - 1 - i;
+        links.add(link);
+      }
+      mLinks = links;
+    }
+
+    @Nullable
+    public AccessibleLink getLinkById(int id) {
+      for (AccessibleLink link : mLinks) {
+        if (link.id == id) {
+          return link;
+        }
+      }
+
+      return null;
+    }
+
+    @Nullable
+    public AccessibleLink getLinkBySpanPos(int start, int end) {
+      for (AccessibleLink link : mLinks) {
+        if (link.start == start && link.end == end) {
+          return link;
+        }
+      }
+
+      return null;
+    }
+
+    public int size() {
+      return mLinks.size();
+    }
+
+    private static class AccessibleLink {
+      public String description;
+      public int start;
+      public int end;
+      public int id;
+    }
   }
 }

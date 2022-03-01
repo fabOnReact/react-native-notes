@@ -17,6 +17,7 @@ import android.text.Spannable;
 import android.text.Spanned;
 import android.text.style.AbsoluteSizeSpan;
 import android.text.style.ClickableSpan;
+import android.util.Log;
 import android.view.View;
 import android.view.accessibility.AccessibilityEvent;
 import android.widget.TextView;
@@ -42,6 +43,7 @@ import com.facebook.react.uimanager.ReactAccessibilityDelegate.AccessibilityRole
 import com.facebook.react.uimanager.events.Event;
 import com.facebook.react.uimanager.events.EventDispatcher;
 import com.facebook.react.uimanager.util.ReactFindViewUtil;
+import com.facebook.react.views.text.ReactTextView;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -97,6 +99,18 @@ public class ReactTextAccessibilityDelegate extends ExploreByTouchHelper {
     // importantForAccessibility to "Yes" (if it is Auto). If we don't reset these it would force
     // every element that has this delegate attached to be focusable, and not allow for
     // announcement coalescing.
+    if (mView instanceof ReactTextView) {
+      ReactTextView textView = (ReactTextView) mView;
+      Log.w(
+          "TESTING::ReactTextAccessibilityDelegate",
+          "textView.getClickableSpans(): " + (textView.getClickableSpans()));
+      /*
+      Log.w("TESTING::ReactTextAccessibilityDelegate", "mView: " + (mView));
+      Log.w(
+          "TESTING::ReactTextAccessibilityDelegate",
+          "mView.getSpanned(): " + (((ReactTextView) mView).getSpanned()));
+          */
+    }
     mView.setFocusable(originalFocus);
     ViewCompat.setImportantForAccessibility(mView, originalImportantForAccessibility);
     mAccessibilityLinks = (AccessibilityLinks) mView.getTag(R.id.accessibility_links);
