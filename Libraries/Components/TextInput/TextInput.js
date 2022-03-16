@@ -402,6 +402,14 @@ type AndroidProps = $ReadOnly<{|
    */
   disableFullscreenUI?: ?boolean,
 
+  /**
+   * String to be read by screenreaders to indicate an error state. If this value is
+   * not null, an error will be announced. You can use onChangeText or onBlur to
+   * detect an error and set this prop. Once the error is gone, set this to null
+   * to clear the error
+   */
+  android_errorMessage?: ?Stringish,
+
   importantForAutofill?: ?(
     | 'auto'
     | 'no'

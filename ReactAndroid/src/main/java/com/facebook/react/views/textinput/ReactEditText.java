@@ -122,6 +122,7 @@ public class ReactEditText extends AppCompatEditText
 
   private static final KeyListener sKeyListener = QwertyKeyListener.getInstanceForFullKeyboard();
   private @Nullable EventDispatcher mEventDispatcher;
+  private @Nullable String mErrorMessage = null;
 
   public ReactEditText(Context context) {
     super(context);
@@ -885,6 +886,7 @@ public class ReactEditText extends AppCompatEditText
     if (mAutoFocus && !mDidAttachToWindow) {
       requestFocusInternal();
     }
+    setError(mErrorMessage);
 
     mDidAttachToWindow = true;
   }
@@ -1066,6 +1068,12 @@ public class ReactEditText extends AppCompatEditText
 
   void setEventDispatcher(@Nullable EventDispatcher eventDispatcher) {
     mEventDispatcher = eventDispatcher;
+  }
+
+  public void setErrorMessage(String error) {
+    mErrorMessage = error;
+    setError(mErrorMessage);
+    invalidate();
   }
 
   /**
