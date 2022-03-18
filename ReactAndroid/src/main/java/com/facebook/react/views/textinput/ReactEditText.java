@@ -889,7 +889,6 @@ public class ReactEditText extends AppCompatEditText
     if (mAutoFocus && !mDidAttachToWindow) {
       requestFocusInternal();
     }
-    setError(mErrorMessage);
 
     mDidAttachToWindow = true;
   }
