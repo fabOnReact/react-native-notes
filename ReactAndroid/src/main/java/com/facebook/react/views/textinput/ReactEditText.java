@@ -122,7 +122,6 @@ public class ReactEditText extends AppCompatEditText
 
   private static final KeyListener sKeyListener = QwertyKeyListener.getInstanceForFullKeyboard();
   private @Nullable EventDispatcher mEventDispatcher;
-  private @Nullable String mErrorMessage = null;
 
   public ReactEditText(Context context) {
     super(context);
@@ -1073,9 +1072,7 @@ public class ReactEditText extends AppCompatEditText
   }
 
   public void setErrorMessage(String error) {
-    mErrorMessage = error;
-    setError(mErrorMessage);
-    invalidate();
+    setError(error);
   }
 
   /**
