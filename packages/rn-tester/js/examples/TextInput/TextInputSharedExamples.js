@@ -476,6 +476,10 @@ class SelectionExample extends React.Component<
 function ErrorExample(): React.Node {
   const [text, setText] = React.useState('');
   const [error, setError] = React.useState(null);
+  React.useEffect(
+    () => console.log('TextInputSharedExamples error', error),
+    [error],
+  );
   return (
     <>
       <Button onPress={() => setError('button')} title="Press to set error" />
@@ -483,7 +487,7 @@ function ErrorExample(): React.Node {
         Type error in the below TextInput to display an error message.
       </Text>
       <TextInput
-        errorMessage={error}
+        android_errorMessage={error}
         onBlur={() => setError('onBlur')}
         onEndEditing={() => setError('onEndEditing')}
         onChangeText={newText => {
