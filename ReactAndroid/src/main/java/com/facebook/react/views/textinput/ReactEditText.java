@@ -105,6 +105,7 @@ public class ReactEditText extends AppCompatEditText
   private boolean mDetectScrollMovement = false;
   private boolean mOnKeyPress = false;
   private TextAttributes mTextAttributes;
+  private @Nullable String mError;
   private boolean mTypefaceDirty = false;
   private @Nullable String mFontFamily = null;
   private int mFontWeight = UNSET;
@@ -144,6 +145,7 @@ public class ReactEditText extends AppCompatEditText
     mKeyListener = new InternalKeyListener();
     mScrollWatcher = null;
     mTextAttributes = new TextAttributes();
+    mError = null;
 
     applyTextAttributes();
 
@@ -233,6 +235,11 @@ public class ReactEditText extends AppCompatEditText
       return true;
     }
     return super.onKeyUp(keyCode, event);
+  }
+
+  public void setErrorMessage(String error) {
+    mError = error;
+    setError(error);
   }
 
   @Override
@@ -565,6 +572,9 @@ public class ReactEditText extends AppCompatEditText
       // try to update state if the wrapper is available. Temporarily disable
       // to prevent an infinite loop.
       getText().replace(0, length(), spannableStringBuilder);
+      if (mError != null) {
+        setError(mError);
+      }
     }
     mDisableTextDiffing = false;
 
