@@ -928,6 +928,10 @@ const emptyFunctionThatReturnsTrue = () => true;
  */
 function InternalTextInput(props: Props): React.Node {
   const inputRef = useRef<null | React.ElementRef<HostComponent<mixed>>>(null);
+  console.log(
+    'TextInput props.android_errorMessage',
+    props.android_errorMessage,
+  );
 
   // Android sends a "onTextChanged" event followed by a "onSelectionChanged" event, for
   // the same "most recent event count".
@@ -984,6 +988,12 @@ function InternalTextInput(props: Props): React.Node {
   // that the update should be ignored and we should stick with the value
   // that we have in JS.
   useLayoutEffect(() => {
+    /*
+    console.log(
+      'TextInput props.android_errorMessage',
+      props.android_errorMessage,
+    );
+    */
     const nativeUpdate = {};
 
     if (lastNativeText !== props.value && typeof props.value === 'string') {
@@ -1123,6 +1133,7 @@ function InternalTextInput(props: Props): React.Node {
     }
 
     setLastNativeText(currentText);
+    console.log('TextInput currentText', currentText);
     // This must happen last, after we call setLastNativeText.
     // Different ordering can cause bugs when editing AndroidTextInputs
     // with multiple Fragments.
@@ -1278,6 +1289,10 @@ function InternalTextInput(props: Props): React.Node {
     if (childCount > 1) {
       children = <Text>{children}</Text>;
     }
+    console.log(
+      'TextInput props.android_errorMessage',
+      props.android_errorMessage,
+    );
 
     textInput = (
       /* $FlowFixMe[prop-missing] the types for AndroidTextInput don't match up

@@ -30,6 +30,7 @@ public class ReactTextUpdate {
   private final int mSelectionStart;
   private final int mSelectionEnd;
   private final int mJustificationMode;
+  private final String mErrorMessage;
 
   public boolean mContainsMultipleFragments;
 
@@ -122,7 +123,8 @@ public class ReactTextUpdate {
       int textBreakStrategy,
       int justificationMode,
       int selectionStart,
-      int selectionEnd) {
+      int selectionEnd,
+      String errorMessage) {
     mText = text;
     mJsEventCounter = jsEventCounter;
     mContainsImages = containsImages;
@@ -135,6 +137,7 @@ public class ReactTextUpdate {
     mSelectionStart = selectionStart;
     mSelectionEnd = selectionEnd;
     mJustificationMode = justificationMode;
+    mErrorMessage = errorMessage;
   }
 
   public static ReactTextUpdate buildReactTextUpdateFromState(
@@ -143,13 +146,24 @@ public class ReactTextUpdate {
       int textAlign,
       int textBreakStrategy,
       int justificationMode,
-      boolean containsMultipleFragments) {
+      boolean containsMultipleFragments,
+      @Nullable string errorMessage) {
 
     ReactTextUpdate reactTextUpdate =
         new ReactTextUpdate(
-            text, jsEventCounter, false, textAlign, textBreakStrategy, justificationMode);
+            text,
+            jsEventCounter,
+            false,
+            textAlign,
+            textBreakStrategy,
+            justificationMode,
+            errorMessage);
     reactTextUpdate.mContainsMultipleFragments = containsMultipleFragments;
     return reactTextUpdate;
+  }
+
+  public String getErrorMessage() {
+    return mErrorMessage;
   }
 
   public Spannable getText() {
