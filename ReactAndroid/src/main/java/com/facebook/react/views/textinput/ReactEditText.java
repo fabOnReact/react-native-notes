@@ -572,9 +572,6 @@ public class ReactEditText extends AppCompatEditText
       // try to update state if the wrapper is available. Temporarily disable
       // to prevent an infinite loop.
       getText().replace(0, length(), spannableStringBuilder);
-      if (mError != null) {
-        setError(mError);
-      }
     }
     mDisableTextDiffing = false;
 
