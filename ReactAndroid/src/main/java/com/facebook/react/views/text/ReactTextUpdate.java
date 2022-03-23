@@ -11,6 +11,7 @@ import static com.facebook.react.views.text.TextAttributeProps.UNSET;
 
 import android.text.Layout;
 import android.text.Spannable;
+import javax.annotation.Nullable;
 
 /**
  * Class that contains the data needed for a text update. Used by both <Text/> and <TextInput/>
@@ -30,7 +31,7 @@ public class ReactTextUpdate {
   private final int mSelectionStart;
   private final int mSelectionEnd;
   private final int mJustificationMode;
-  private final String mErrorMessage;
+  private String mErrorMessage;
 
   public boolean mContainsMultipleFragments;
 
@@ -60,7 +61,8 @@ public class ReactTextUpdate {
         Layout.BREAK_STRATEGY_HIGH_QUALITY,
         Layout.JUSTIFICATION_MODE_NONE,
         -1,
-        -1);
+        -1,
+        null);
   }
 
   public ReactTextUpdate(
@@ -86,7 +88,8 @@ public class ReactTextUpdate {
         textBreakStrategy,
         justificationMode,
         -1,
-        -1);
+        -1,
+        null);
   }
 
   public ReactTextUpdate(
@@ -108,7 +111,8 @@ public class ReactTextUpdate {
         textBreakStrategy,
         justificationMode,
         -1,
-        -1);
+        -1,
+        null);
   }
 
   public ReactTextUpdate(
@@ -137,7 +141,7 @@ public class ReactTextUpdate {
     mSelectionStart = selectionStart;
     mSelectionEnd = selectionEnd;
     mJustificationMode = justificationMode;
-    mErrorMessage = errorMessage;
+    mErrorMessage = "This is my test";
   }
 
   public static ReactTextUpdate buildReactTextUpdateFromState(
@@ -147,18 +151,13 @@ public class ReactTextUpdate {
       int textBreakStrategy,
       int justificationMode,
       boolean containsMultipleFragments,
-      @Nullable string errorMessage) {
+      @Nullable String errorMessage) {
 
     ReactTextUpdate reactTextUpdate =
         new ReactTextUpdate(
-            text,
-            jsEventCounter,
-            false,
-            textAlign,
-            textBreakStrategy,
-            justificationMode,
-            errorMessage);
+            text, jsEventCounter, false, textAlign, textBreakStrategy, justificationMode);
     reactTextUpdate.mContainsMultipleFragments = containsMultipleFragments;
+    reactTextUpdate.mErrorMessage = "This is my second test";
     return reactTextUpdate;
   }
 

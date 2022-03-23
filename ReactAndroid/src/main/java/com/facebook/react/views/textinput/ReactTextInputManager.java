@@ -23,6 +23,7 @@ import android.text.Layout;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
@@ -325,7 +326,7 @@ public class ReactTextInputManager extends BaseViewManager<ReactEditText, Layout
     sb.append(TextTransform.apply(text, TextTransform.UNSET));
 
     return new ReactTextUpdate(
-        sb, mostRecentEventCount, false, 0, 0, 0, 0, Gravity.NO_GRAVITY, 0, 0, start, end);
+        sb, mostRecentEventCount, false, 0, 0, 0, 0, Gravity.NO_GRAVITY, 0, 0, start, end, null);
   }
 
   @Override
@@ -349,6 +350,9 @@ public class ReactTextInputManager extends BaseViewManager<ReactEditText, Layout
             paddingBottom != UNSET ? paddingBottom : view.getPaddingBottom());
       }
 
+      Log.w(
+          "TESTING::ReactTextInputManager",
+          "update.getErrorMessage(): " + (update.getErrorMessage()));
       if (update.containsImages()) {
         Spannable spannable = update.getText();
         TextInlineImageSpan.possiblyUpdateInlineImageSpans(spannable, view);
@@ -1331,6 +1335,7 @@ public class ReactTextInputManager extends BaseViewManager<ReactEditText, Layout
         TextAttributeProps.getTextAlignment(props, TextLayoutManager.isRTL(attributedString)),
         textBreakStrategy,
         TextAttributeProps.getJustificationMode(props),
-        containsMultipleFragments);
+        containsMultipleFragments,
+        "test error");
   }
 }
