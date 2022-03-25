@@ -159,6 +159,7 @@ TextAttributes TextAttributes::defaultTextAttributes() {
     textAttributes.backgroundColor = clearColor();
     textAttributes.fontSize = 14.0;
     textAttributes.fontSizeMultiplier = 1.0;
+    textAttributes.errorMessageAndroid = "TextAttributes defaultTextAttributes";
     return textAttributes;
   }();
   return textAttributes;

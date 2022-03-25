@@ -109,6 +109,7 @@ void ParagraphShadowNode::updateStateIfNeeded(Content const &content) {
     return;
   }
 
+  // content.attributedString.errorMessageAndroid = "updateStateIfNeeded";
   setStateData(ParagraphState{
       content.attributedString,
       content.paragraphAttributes,
@@ -132,6 +133,7 @@ Size ParagraphShadowNode::measureContent(
     auto string = BaseTextShadowNode::getEmptyPlaceholder();
     auto textAttributes = TextAttributes::defaultTextAttributes();
     textAttributes.fontSizeMultiplier = layoutContext.fontSizeMultiplier;
+    textAttributes.errorMessageAndroid = "error";
     textAttributes.apply(getConcreteProps().textAttributes);
     attributedString.appendFragment({string, textAttributes, {}});
   }

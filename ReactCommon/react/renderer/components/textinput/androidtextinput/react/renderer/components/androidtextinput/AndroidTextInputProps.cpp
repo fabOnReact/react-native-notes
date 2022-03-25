@@ -48,25 +48,41 @@ AndroidTextInputProps::AndroidTextInputProps(
           "autoComplete",
           sourceProps.autoComplete,
           {})),
-      returnKeyLabel(convertRawProp(context, rawProps,
+      returnKeyLabel(convertRawProp(
+          context,
+          rawProps,
           "returnKeyLabel",
           sourceProps.returnKeyLabel,
           {})),
-      numberOfLines(convertRawProp(context, rawProps,
+      numberOfLines(convertRawProp(
+          context,
+          rawProps,
           "numberOfLines",
           sourceProps.numberOfLines,
           {0})),
-      disableFullscreenUI(convertRawProp(context, rawProps,
+      disableFullscreenUI(convertRawProp(
+          context,
+          rawProps,
           "disableFullscreenUI",
           sourceProps.disableFullscreenUI,
           {false})),
-      textBreakStrategy(convertRawProp(context, rawProps,
+      textBreakStrategy(convertRawProp(
+          context,
+          rawProps,
           "textBreakStrategy",
           sourceProps.textBreakStrategy,
           {})),
-      underlineColorAndroid(convertRawProp(context, rawProps,
+      underlineColorAndroid(convertRawProp(
+          context,
+          rawProps,
           "underlineColorAndroid",
           sourceProps.underlineColorAndroid,
+          {})),
+      errorMessageAndroid(convertRawProp(
+          context,
+          rawProps,
+          "errorMessageAndroid",
+          sourceProps.errorMessageAndroid,
           {})),
       inlineImageLeft(convertRawProp(context, rawProps,
           "inlineImageLeft",
@@ -267,6 +283,7 @@ folly::dynamic AndroidTextInputProps::getDynamic() const {
   props["disableFullscreenUI"] = disableFullscreenUI;
   props["textBreakStrategy"] = textBreakStrategy;
   props["underlineColorAndroid"] = toAndroidRepr(underlineColorAndroid);
+  props["errorMessageAndroid"] = errorMessageAndroid;
   props["inlineImageLeft"] = inlineImageLeft;
   props["inlineImagePadding"] = inlineImagePadding;
   props["importantForAutofill"] = importantForAutofill;

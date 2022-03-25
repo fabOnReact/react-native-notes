@@ -16,7 +16,7 @@
 #include <yoga/YGValue.h>
 
 #include <react/renderer/core/ConcreteComponentDescriptor.h>
-
+#include <string>
 namespace facebook {
 namespace react {
 
@@ -70,6 +70,7 @@ class AndroidTextInputComponentDescriptor final
       env->DeleteLocalRef(defaultTextInputPaddingArray);
     }
 
+    std::string error = "AndroidTextInputComponentDescriptor";
     return std::make_shared<AndroidTextInputShadowNode::ConcreteState>(
         std::make_shared<AndroidTextInputState const>(AndroidTextInputState(
             0,
@@ -81,7 +82,8 @@ class AndroidTextInputComponentDescriptor final
             ((YGValue)theme[YGEdgeStart]).value,
             ((YGValue)theme[YGEdgeEnd]).value,
             ((YGValue)theme[YGEdgeTop]).value,
-            ((YGValue)theme[YGEdgeBottom]).value)),
+            ((YGValue)theme[YGEdgeBottom]).value,
+            error)),
         family);
   }
 

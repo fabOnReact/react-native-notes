@@ -5,13 +5,19 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#include "AndroidTextInputState.h"
+#include <glog/logging.h>
 
+#include <logger/react_native_log.h>
+#include <glog/logging.h>
+#include <logger/react_native_log.h>
+#include "AndroidTextInputState.h"
+#include <iostream>
 #include <react/renderer/components/text/conversions.h>
 #include <react/renderer/debug/debugStringConvertibleUtils.h>
+#include <string>
 
 #include <utility>
-
+using namespace std;
 namespace facebook {
 namespace react {
 
@@ -25,7 +31,8 @@ AndroidTextInputState::AndroidTextInputState(
     float defaultThemePaddingStart,
     float defaultThemePaddingEnd,
     float defaultThemePaddingTop,
-    float defaultThemePaddingBottom)
+    float defaultThemePaddingBottom,
+    std::string defaultErrorMessageAndroid)
     : mostRecentEventCount(mostRecentEventCount),
       attributedString(std::move(attributedString)),
       reactTreeAttributedString(std::move(reactTreeAttributedString)),
@@ -35,7 +42,8 @@ AndroidTextInputState::AndroidTextInputState(
       defaultThemePaddingStart(defaultThemePaddingStart),
       defaultThemePaddingEnd(defaultThemePaddingEnd),
       defaultThemePaddingTop(defaultThemePaddingTop),
-      defaultThemePaddingBottom(defaultThemePaddingBottom) {}
+      defaultThemePaddingBottom(defaultThemePaddingBottom),
+      defaultErrorMessageAndroid(defaultErrorMessageAndroid) {}
 
 AndroidTextInputState::AndroidTextInputState(
     AndroidTextInputState const &previousState,
@@ -51,6 +59,7 @@ AndroidTextInputState::AndroidTextInputState(
       attributedString(previousState.attributedString),
       reactTreeAttributedString(previousState.reactTreeAttributedString),
       paragraphAttributes(previousState.paragraphAttributes),
+      errorMessageAndroid(previousState.errorMessageAndroid),
       defaultTextAttributes(previousState.defaultTextAttributes),
       defaultParentShadowView(previousState.defaultParentShadowView),
       defaultThemePaddingStart(data.getDefault(
@@ -68,7 +77,11 @@ AndroidTextInputState::AndroidTextInputState(
       defaultThemePaddingBottom(data.getDefault(
                                         "themePaddingBottom",
                                         previousState.defaultThemePaddingBottom)
-                                    .getDouble()){};
+                                    .getDouble()),
+      defaultErrorMessageAndroid(data.getDefault(
+          "defaultErrorMessageAndroid",
+          previousState.defaultErrorMessageAndroid)
+                                    .getString()) {};
 
 #ifdef ANDROID
 folly::dynamic AndroidTextInputState::getDynamic() const {
@@ -80,12 +93,14 @@ folly::dynamic AndroidTextInputState::getDynamic() const {
   // called from Java to trigger a relayout with a `cachedAttributedStringId`,
   // so Java has all up-to-date information and we should pass an empty map
   // through.
+
   if (cachedAttributedStringId == 0) {
     newState["mostRecentEventCount"] = mostRecentEventCount;
     newState["attributedString"] = toDynamic(attributedString);
     newState["hash"] = newState["attributedString"]["hash"];
-    newState["paragraphAttributes"] =
-        toDynamic(paragraphAttributes); // TODO: can we memoize this in Java?
+    newState["paragraphAttributes"] = toDynamic(
+        paragraphAttributes); // TODO: can we memoize this in Java?
+    newState["errorMessageAndroid"] = errorMessageAndroid;
   }
   return newState;
 }

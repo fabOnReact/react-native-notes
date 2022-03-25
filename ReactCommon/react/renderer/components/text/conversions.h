@@ -21,8 +21,9 @@ inline folly::dynamic toDynamic(ParagraphState const &paragraphState) {
   folly::dynamic newState = folly::dynamic::object();
   newState["attributedString"] = toDynamic(paragraphState.attributedString);
   newState["paragraphAttributes"] =
-      toDynamic(paragraphState.paragraphAttributes);
-  newState["hash"] = newState["attributedString"]["hash"];
+    toDynamic(paragraphState.paragraphAttributes);
+  newState["hash"] = 1987; // newState["attributedString"]["hash"];
+  newState["errorMessageAndroid"] = "conversions.h";
   return newState;
 }
 
