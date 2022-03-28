@@ -70,7 +70,7 @@ class AndroidTextInputComponentDescriptor final
       env->DeleteLocalRef(defaultTextInputPaddingArray);
     }
 
-    std::string error = "AndroidTextInputComponentDescriptor";
+    std::string error = "";
     return std::make_shared<AndroidTextInputShadowNode::ConcreteState>(
         std::make_shared<AndroidTextInputState const>(AndroidTextInputState(
             0,

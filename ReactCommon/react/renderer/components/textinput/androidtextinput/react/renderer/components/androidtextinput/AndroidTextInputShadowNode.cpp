@@ -149,12 +149,6 @@ void AndroidTextInputShadowNode::updateStateIfNeeded() {
            ? 0
            : getConcreteProps().mostRecentEventCount);
   auto newAttributedString = getMostRecentAttributedString();
-  // std::string mostRecentEventCountToString =
-  //     std::to_string(state.mostRecentEventCount);
-  // std::string defaultTextAttributesToString =
-  // std::to_string(defaultTextAttributes);
-  // LOG(ERROR) << "TESTING: state.errorMessageAndroid" + state.errorMessageAndroid;
-  // LOG(ERROR) << "TESTING: defaultTextAttributes" + defaultTextAttributesToString;
   // Even if we're here and updating state, it may be only to update the layout
   // manager If that is the case, make sure we don't update text: pass in the
   // current attributedString unchanged, and pass in zero for the "event count"

@@ -1328,9 +1328,16 @@ public class ReactTextInputManager extends BaseViewManager<ReactEditText, Layout
     int textBreakStrategy =
         TextAttributeProps.getTextBreakStrategy(paragraphAttributes.getString("textBreakStrategy"));
 
-    @Nullable
-    String errorMessage =
-        props.hasKey("errorMessageAndroid") ? props.getString("errorMessageAndroid") : null;
+    @Nullable String errorMessageAndroid;
+    if (state.hasKey("errorMessageAndroid")) {
+      String string = state.getString("errorMessageAndroid");
+      Log.w("TESTING::ReactTextInputManager", "string: " + (string));
+      Log.w("TESTING::ReactTextInputManager", "string.length(): " + (string.length()));
+      errorMessageAndroid = string.length() > 0 ? string : null;
+      Log.w("TESTING::ReactTextInputManager", "errorMessageAndroid: " + (errorMessageAndroid));
+    } else {
+      errorMessageAndroid = null;
+    }
 
     return ReactTextUpdate.buildReactTextUpdateFromState(
         spanned,
@@ -1339,6 +1346,6 @@ public class ReactTextInputManager extends BaseViewManager<ReactEditText, Layout
         textBreakStrategy,
         TextAttributeProps.getJustificationMode(props),
         containsMultipleFragments,
-        state.getString("errorMessageAndroid"));
+        errorMessageAndroid);
   }
 }
