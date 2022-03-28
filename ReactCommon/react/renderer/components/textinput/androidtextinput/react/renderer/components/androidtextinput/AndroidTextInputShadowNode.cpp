@@ -133,6 +133,8 @@ void AndroidTextInputShadowNode::updateStateIfNeeded() {
   if (getConcreteProps().mostRecentEventCount < state.mostRecentEventCount) {
     return;
   }
+  LOG(ERROR) << "TESTING:: getConcreteProps().errorMessageAndroid: " << getConcreteProps().errorMessageAndroid;
+  LOG(ERROR) << "TESTING:: state.errorMessageAndroid: " << state.errorMessageAndroid;
 
   // Store default TextAttributes in state.
   // In the case where the TextInput is completely empty (no value, no
@@ -158,7 +160,7 @@ void AndroidTextInputShadowNode::updateStateIfNeeded() {
   // current attributedString unchanged, and pass in zero for the "event count"
   // so no changes are applied There's no way to prevent a state update from
   // flowing to Java, so we just ensure it's a noop in those cases.
-  std::string test = "AndroidTextInputShadowNode";
+  std::string errorMessageAndroid = getConcreteProps().errorMessageAndroid;
   setStateData(AndroidTextInputState{
       newEventCount,
       newAttributedString,
@@ -170,7 +172,7 @@ void AndroidTextInputShadowNode::updateStateIfNeeded() {
       state.defaultThemePaddingEnd,
       state.defaultThemePaddingTop,
       state.defaultThemePaddingBottom,
-      test});
+      errorMessageAndroid});
 }
 
 #pragma mark - LayoutableShadowNode

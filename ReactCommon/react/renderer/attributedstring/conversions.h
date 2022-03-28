@@ -592,6 +592,7 @@ inline void fromRawValue(
   react_native_assert(value.hasType<std::string>());
   if (value.hasType<std::string>()) {
     auto string = (std::string)value;
+    LOG(ERROR) << "TESTING:: AccessibilityRole: " << string;
     if (string == "none") {
       result = AccessibilityRole::None;
     } else if (string == "button") {
@@ -685,6 +686,7 @@ inline void fromRawValue(
   react_native_assert(value.hasType<std::string>());
   if (value.hasType<std::string>()) {
     auto string = (std::string)value;
+    LOG(ERROR) << "TESTING:: HyphenationFrequency value: " << string;
     if (string == "none") {
       result = HyphenationFrequency::None;
     } else if (string == "normal") {
@@ -760,6 +762,7 @@ inline ParagraphAttributes convertRawProp(
       "android_hyphenationFrequency",
       sourceParagraphAttributes.android_hyphenationFrequency,
       defaultParagraphAttributes.android_hyphenationFrequency);
+  paragraphAttributes.errorMessageAndroid = sourceParagraphAttributes.errorMessageAndroid;
 
   return paragraphAttributes;
 }
@@ -798,6 +801,9 @@ inline folly::dynamic toDynamic(
   values(
       "android_hyphenationFrequency",
       toString(paragraphAttributes.android_hyphenationFrequency));
+  values(
+      "errorMessageAndroid",
+      toString(paragraphAttributes.errorMessageAndroid));
 
   return values;
 }
@@ -990,6 +996,7 @@ constexpr static MapBuffer::Key PA_KEY_TEXT_BREAK_STRATEGY = 2;
 constexpr static MapBuffer::Key PA_KEY_ADJUST_FONT_SIZE_TO_FIT = 3;
 constexpr static MapBuffer::Key PA_KEY_INCLUDE_FONT_PADDING = 4;
 constexpr static MapBuffer::Key PA_KEY_HYPHENATION_FREQUENCY = 5;
+constexpr static MapBuffer::Key PA_KEY_ERROR_MESSAGE = 6;
 
 inline MapBuffer toMapBuffer(const ParagraphAttributes &paragraphAttributes) {
   auto builder = MapBufferBuilder();
@@ -1007,6 +1014,9 @@ inline MapBuffer toMapBuffer(const ParagraphAttributes &paragraphAttributes) {
   builder.putString(
       PA_KEY_HYPHENATION_FREQUENCY,
       toString(paragraphAttributes.android_hyphenationFrequency));
+  builder.putString(
+      PA_KEY_ERROR_MESSAGE,
+      toString(paragraphAttributes.errorMessageAndroid));
 
   return builder.build();
 }

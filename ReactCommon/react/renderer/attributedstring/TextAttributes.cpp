@@ -93,6 +93,7 @@ void TextAttributes::apply(TextAttributes textAttributes) {
   layoutDirection = textAttributes.layoutDirection.has_value()
       ? textAttributes.layoutDirection
       : layoutDirection;
+  // LOG(ERROR) << "TESTING:: " << (std::string)getDebugProps();
   accessibilityRole = textAttributes.accessibilityRole.has_value()
       ? textAttributes.accessibilityRole
       : accessibilityRole;

@@ -16,20 +16,24 @@ namespace facebook {
 namespace react {
 
 bool ParagraphAttributes::operator==(const ParagraphAttributes &rhs) const {
+  LOG(ERROR) << "TESTING:: rhs.maximumNumberOfLines: " << rhs.maximumNumberOfLines;
+  LOG(ERROR) << "TESTING:: rhs.errorMessageAndroid: " << rhs.errorMessageAndroid;
   return std::tie(
              maximumNumberOfLines,
              ellipsizeMode,
              textBreakStrategy,
              adjustsFontSizeToFit,
              includeFontPadding,
-             android_hyphenationFrequency) ==
+             android_hyphenationFrequency,
+             errorMessageAndroid) ==
       std::tie(
              rhs.maximumNumberOfLines,
              rhs.ellipsizeMode,
              rhs.textBreakStrategy,
              rhs.adjustsFontSizeToFit,
              rhs.includeFontPadding,
-             rhs.android_hyphenationFrequency) &&
+             rhs.android_hyphenationFrequency,
+             rhs.errorMessageAndroid) &&
       floatEquality(minimumFontSize, rhs.minimumFontSize) &&
       floatEquality(maximumFontSize, rhs.maximumFontSize);
 }
@@ -51,7 +55,9 @@ SharedDebugStringConvertibleList ParagraphAttributes::getDebugProps() const {
       debugStringConvertibleItem("maximumFontSize", maximumFontSize),
       debugStringConvertibleItem("includeFontPadding", includeFontPadding),
       debugStringConvertibleItem(
-          "android_hyphenationFrequency", android_hyphenationFrequency)};
+          "android_hyphenationFrequency", android_hyphenationFrequency),
+      debugStringConvertibleItem(
+          "errorMessageAndroid", errorMessageAndroid)};
 }
 #endif
 

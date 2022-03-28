@@ -37,13 +37,13 @@ AndroidTextInputState::AndroidTextInputState(
       attributedString(std::move(attributedString)),
       reactTreeAttributedString(std::move(reactTreeAttributedString)),
       paragraphAttributes(std::move(paragraphAttributes)),
+      errorMessageAndroid(defaultErrorMessageAndroid),
       defaultTextAttributes(std::move(defaultTextAttributes)),
       defaultParentShadowView(std::move(defaultParentShadowView)),
       defaultThemePaddingStart(defaultThemePaddingStart),
       defaultThemePaddingEnd(defaultThemePaddingEnd),
       defaultThemePaddingTop(defaultThemePaddingTop),
-      defaultThemePaddingBottom(defaultThemePaddingBottom),
-      defaultErrorMessageAndroid(defaultErrorMessageAndroid) {}
+      defaultThemePaddingBottom(defaultThemePaddingBottom) {}
 
 AndroidTextInputState::AndroidTextInputState(
     AndroidTextInputState const &previousState,
@@ -77,11 +77,7 @@ AndroidTextInputState::AndroidTextInputState(
       defaultThemePaddingBottom(data.getDefault(
                                         "themePaddingBottom",
                                         previousState.defaultThemePaddingBottom)
-                                    .getDouble()),
-      defaultErrorMessageAndroid(data.getDefault(
-          "defaultErrorMessageAndroid",
-          previousState.defaultErrorMessageAndroid)
-                                    .getString()) {};
+                                    .getDouble()) {};
 
 #ifdef ANDROID
 folly::dynamic AndroidTextInputState::getDynamic() const {
@@ -93,6 +89,7 @@ folly::dynamic AndroidTextInputState::getDynamic() const {
   // called from Java to trigger a relayout with a `cachedAttributedStringId`,
   // so Java has all up-to-date information and we should pass an empty map
   // through.
+  LOG(ERROR) << "TESTING:: errorMessageAndroid: " << errorMessageAndroid;
 
   if (cachedAttributedStringId == 0) {
     newState["mostRecentEventCount"] = mostRecentEventCount;
