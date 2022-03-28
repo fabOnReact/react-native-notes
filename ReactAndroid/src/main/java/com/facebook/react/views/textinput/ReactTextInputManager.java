@@ -1339,6 +1339,6 @@ public class ReactTextInputManager extends BaseViewManager<ReactEditText, Layout
         textBreakStrategy,
         TextAttributeProps.getJustificationMode(props),
         containsMultipleFragments,
-        errorMessage);
+        state.getString("errorMessageAndroid"));
   }
 }
