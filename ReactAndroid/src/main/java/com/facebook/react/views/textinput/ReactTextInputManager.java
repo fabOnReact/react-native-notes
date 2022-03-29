@@ -1329,8 +1329,8 @@ public class ReactTextInputManager extends BaseViewManager<ReactEditText, Layout
         TextAttributeProps.getTextBreakStrategy(paragraphAttributes.getString("textBreakStrategy"));
 
     @Nullable String errorMessageAndroid;
-    if (state.hasKey("errorMessageAndroid")) {
-      String string = state.getString("errorMessageAndroid");
+    if (paragraphAttributes.hasKey("errorMessageAndroid")) {
+      String string = paragraphAttributes.getString("errorMessageAndroid");
       Log.w("TESTING::ReactTextInputManager", "string: " + (string));
       Log.w("TESTING::ReactTextInputManager", "string.length(): " + (string.length()));
       errorMessageAndroid = string.length() > 0 ? string : null;

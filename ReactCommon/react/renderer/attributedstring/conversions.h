@@ -762,7 +762,12 @@ inline ParagraphAttributes convertRawProp(
       "android_hyphenationFrequency",
       sourceParagraphAttributes.android_hyphenationFrequency,
       defaultParagraphAttributes.android_hyphenationFrequency);
-  paragraphAttributes.errorMessageAndroid = sourceParagraphAttributes.errorMessageAndroid;
+  paragraphAttributes.errorMessageAndroid = convertRawProp(
+      context,
+      rawProps,
+      "errorMessageAndroid",
+      sourceParagraphAttributes.errorMessageAndroid,
+      defaultParagraphAttributes.errorMessageAndroid);
 
   return paragraphAttributes;
 }
