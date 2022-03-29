@@ -514,7 +514,11 @@ public class ReactEditText extends AppCompatEditText
     if (!canUpdateWithEventCount(eventCounter) || getError() == errorMessage) {
       return;
     }
-    setError(errorMessage);
+    if (errorMessage.length() == 0) {
+      setError(null);
+    } else {
+      setError(errorMessage);
+    }
   }
 
   public void maybeSetTextFromJS(ReactTextUpdate reactTextUpdate) {
