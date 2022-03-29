@@ -105,11 +105,6 @@ public abstract class ReactTextAnchorViewManager<T extends View, C extends React
     }
   }
 
-  @ReactProp(name = "errorMessageAndroid")
-  public void setErrorMessage(ReactTextView view, @Nullable String error) {
-    view.setError(error);
-  }
-
   @ReactProp(name = "android_hyphenationFrequency")
   public void setAndroidHyphenationFrequency(ReactTextView view, @Nullable String frequency) {
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
