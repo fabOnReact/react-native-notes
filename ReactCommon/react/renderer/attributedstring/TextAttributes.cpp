@@ -93,7 +93,6 @@ void TextAttributes::apply(TextAttributes textAttributes) {
   layoutDirection = textAttributes.layoutDirection.has_value()
       ? textAttributes.layoutDirection
       : layoutDirection;
-  // LOG(ERROR) << "TESTING:: " << (std::string)getDebugProps();
   accessibilityRole = textAttributes.accessibilityRole.has_value()
       ? textAttributes.accessibilityRole
       : accessibilityRole;
@@ -160,7 +159,6 @@ TextAttributes TextAttributes::defaultTextAttributes() {
     textAttributes.backgroundColor = clearColor();
     textAttributes.fontSize = 14.0;
     textAttributes.fontSizeMultiplier = 1.0;
-    textAttributes.errorMessageAndroid = "TextAttributes defaultTextAttributes";
     return textAttributes;
   }();
   return textAttributes;

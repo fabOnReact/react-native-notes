@@ -16,8 +16,6 @@ namespace facebook {
 namespace react {
 
 bool ParagraphAttributes::operator==(const ParagraphAttributes &rhs) const {
-  LOG(ERROR) << "TESTING:: rhs.maximumNumberOfLines: " << rhs.maximumNumberOfLines;
-  LOG(ERROR) << "TESTING:: rhs.errorMessageAndroid: " << rhs.errorMessageAndroid;
   return std::tie(
              maximumNumberOfLines,
              ellipsizeMode,

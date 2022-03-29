@@ -7,7 +7,6 @@
 
 #include "AndroidTextInputShadowNode.h"
 
-#include <glog/logging.h>
 #include <fbjni/fbjni.h>
 #include <react/debug/react_native_assert.h>
 #include <react/jni/ReadableNativeMap.h>
@@ -17,7 +16,7 @@
 #include <react/renderer/core/LayoutConstraints.h>
 #include <react/renderer/core/LayoutContext.h>
 #include <react/renderer/core/conversions.h>
-#include <string>
+
 #include <utility>
 
 using namespace facebook::jni;
@@ -147,16 +146,12 @@ void AndroidTextInputShadowNode::updateStateIfNeeded() {
            ? 0
            : getConcreteProps().mostRecentEventCount);
   auto newAttributedString = getMostRecentAttributedString();
+
   // Even if we're here and updating state, it may be only to update the layout
   // manager If that is the case, make sure we don't update text: pass in the
   // current attributedString unchanged, and pass in zero for the "event count"
   // so no changes are applied There's no way to prevent a state update from
   // flowing to Java, so we just ensure it's a noop in those cases.
-  /*
-  std::string errorMessageAndroid = getConcreteProps().errorMessageAndroid;
-  ParagraphAttributes paragraphAttributes = getConcreteProps().paragraphAttributes;
-  paragraphAttributes.errorMessageAndroid = errorMessageAndroid;
-  */
   setStateData(AndroidTextInputState{
       newEventCount,
       newAttributedString,

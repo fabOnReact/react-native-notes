@@ -69,12 +69,6 @@ TextInputProps::TextInputProps(
           "underlineColorAndroid",
           sourceProps.underlineColorAndroid,
           {})),
-      errorMessageAndroid(convertRawProp(
-          context,
-          rawProps,
-          "errorMessageAndroid",
-          sourceProps.errorMessageAndroid,
-          {})),
       text(convertRawProp(context, rawProps, "text", sourceProps.text, {})),
       mostRecentEventCount(convertRawProp(
           context,
