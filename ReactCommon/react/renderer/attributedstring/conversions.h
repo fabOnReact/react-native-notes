@@ -592,7 +592,6 @@ inline void fromRawValue(
   react_native_assert(value.hasType<std::string>());
   if (value.hasType<std::string>()) {
     auto string = (std::string)value;
-    LOG(ERROR) << "TESTING:: AccessibilityRole: " << string;
     if (string == "none") {
       result = AccessibilityRole::None;
     } else if (string == "button") {
@@ -686,7 +685,6 @@ inline void fromRawValue(
   react_native_assert(value.hasType<std::string>());
   if (value.hasType<std::string>()) {
     auto string = (std::string)value;
-    LOG(ERROR) << "TESTING:: HyphenationFrequency value: " << string;
     if (string == "none") {
       result = HyphenationFrequency::None;
     } else if (string == "normal") {

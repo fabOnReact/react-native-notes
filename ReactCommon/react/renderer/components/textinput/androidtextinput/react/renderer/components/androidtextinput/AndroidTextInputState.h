@@ -10,7 +10,6 @@
 #include <react/renderer/attributedstring/AttributedString.h>
 #include <react/renderer/attributedstring/ParagraphAttributes.h>
 #include <react/renderer/textlayoutmanager/TextLayoutManager.h>
-#include <string>
 
 #ifdef ANDROID
 #include <folly/dynamic.h>
