@@ -1331,10 +1331,7 @@ public class ReactTextInputManager extends BaseViewManager<ReactEditText, Layout
     @Nullable String errorMessageAndroid;
     if (paragraphAttributes.hasKey("errorMessageAndroid")) {
       String string = paragraphAttributes.getString("errorMessageAndroid");
-      Log.w("TESTING::ReactTextInputManager", "string: " + (string));
-      Log.w("TESTING::ReactTextInputManager", "string.length(): " + (string.length()));
       errorMessageAndroid = string.length() > 0 ? string : null;
-      Log.w("TESTING::ReactTextInputManager", "errorMessageAndroid: " + (errorMessageAndroid));
     } else {
       errorMessageAndroid = null;
     }
