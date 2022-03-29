@@ -45,7 +45,6 @@ export const NativeText: HostComponent<NativeTextProps> =
       onInlineViewLayout: true,
       dataDetectorType: true,
       android_hyphenationFrequency: true,
-      errorMessageAndroid: true,
     },
     directEventTypes: {
       topTextLayout: {
