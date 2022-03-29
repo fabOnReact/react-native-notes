@@ -68,6 +68,7 @@ export type TextProps = $ReadOnly<{|
    *
    */
   android_hyphenationFrequency?: ?('normal' | 'none' | 'full'),
+  errorMessageAndroid?: ?Stringish,
   children?: ?Node,
 
   /**
