@@ -55,8 +55,6 @@ class AndroidTextInputState final {
    */
   ParagraphAttributes paragraphAttributes{};
 
-  std::string errorMessageAndroid{};
-
   /**
    * Default TextAttributes used if we need to construct a new Fragment.
    * Only used if text is inserted into an AttributedString with no existing
@@ -79,7 +77,6 @@ class AndroidTextInputState final {
   float defaultThemePaddingEnd{NAN};
   float defaultThemePaddingTop{NAN};
   float defaultThemePaddingBottom{NAN};
-  std::string defaultErrorMessageAndroid{};
 
   AndroidTextInputState(
       int64_t mostRecentEventCount,
@@ -91,8 +88,7 @@ class AndroidTextInputState final {
       float defaultThemePaddingStart,
       float defaultThemePaddingEnd,
       float defaultThemePaddingTop,
-      float defaultThemePaddingBottom,
-      std::string defaultErrorMessageAndroid);
+      float defaultThemePaddingBottom);
 
   AndroidTextInputState() = default;
   AndroidTextInputState(

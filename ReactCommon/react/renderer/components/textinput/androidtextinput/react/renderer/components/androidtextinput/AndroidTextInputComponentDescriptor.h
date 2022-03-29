@@ -82,8 +82,7 @@ class AndroidTextInputComponentDescriptor final
             ((YGValue)theme[YGEdgeStart]).value,
             ((YGValue)theme[YGEdgeEnd]).value,
             ((YGValue)theme[YGEdgeTop]).value,
-            ((YGValue)theme[YGEdgeBottom]).value,
-            error)),
+            ((YGValue)theme[YGEdgeBottom]).value)),
         family);
   }
 

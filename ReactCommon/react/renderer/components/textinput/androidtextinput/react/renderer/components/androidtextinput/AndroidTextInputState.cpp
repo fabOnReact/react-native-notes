@@ -31,13 +31,11 @@ AndroidTextInputState::AndroidTextInputState(
     float defaultThemePaddingStart,
     float defaultThemePaddingEnd,
     float defaultThemePaddingTop,
-    float defaultThemePaddingBottom,
-    std::string defaultErrorMessageAndroid)
+    float defaultThemePaddingBottom)
     : mostRecentEventCount(mostRecentEventCount),
       attributedString(std::move(attributedString)),
       reactTreeAttributedString(std::move(reactTreeAttributedString)),
       paragraphAttributes(std::move(paragraphAttributes)),
-      errorMessageAndroid(defaultErrorMessageAndroid),
       defaultTextAttributes(std::move(defaultTextAttributes)),
       defaultParentShadowView(std::move(defaultParentShadowView)),
       defaultThemePaddingStart(defaultThemePaddingStart),
@@ -59,7 +57,6 @@ AndroidTextInputState::AndroidTextInputState(
       attributedString(previousState.attributedString),
       reactTreeAttributedString(previousState.reactTreeAttributedString),
       paragraphAttributes(previousState.paragraphAttributes),
-      errorMessageAndroid(previousState.errorMessageAndroid),
       defaultTextAttributes(previousState.defaultTextAttributes),
       defaultParentShadowView(previousState.defaultParentShadowView),
       defaultThemePaddingStart(data.getDefault(
@@ -89,7 +86,6 @@ folly::dynamic AndroidTextInputState::getDynamic() const {
   // called from Java to trigger a relayout with a `cachedAttributedStringId`,
   // so Java has all up-to-date information and we should pass an empty map
   // through.
-  LOG(ERROR) << "TESTING:: errorMessageAndroid: " << errorMessageAndroid;
 
   if (cachedAttributedStringId == 0) {
     newState["mostRecentEventCount"] = mostRecentEventCount;
@@ -97,7 +93,6 @@ folly::dynamic AndroidTextInputState::getDynamic() const {
     newState["hash"] = newState["attributedString"]["hash"];
     newState["paragraphAttributes"] = toDynamic(
         paragraphAttributes); // TODO: can we memoize this in Java?
-    newState["errorMessageAndroid"] = errorMessageAndroid;
   }
   return newState;
 }
