@@ -8,25 +8,190 @@
  * @format
  */
 
-import * as React from 'react';
+import type {RNTesterModuleExample} from '../../types/RNTesterTypes';
+import type {ViewStyleProp} from 'react-native/Libraries/StyleSheet/StyleSheet';
 
+import ScrollViewPressableStickyHeaderExample from './ScrollViewPressableStickyHeaderExample';
+import nullthrows from 'nullthrows';
+import * as React from 'react';
+import {useCallback, useState} from 'react';
 import {
   Platform,
+  RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
-  TextInput,
-  RefreshControl,
 } from 'react-native';
 
-import nullthrows from 'nullthrows';
+class EnableDisableList extends React.Component<{}, {scrollEnabled: boolean}> {
+  state: {scrollEnabled: boolean} = {
+    scrollEnabled: true,
+  };
+  render(): React.Node {
+    return (
+      <View>
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          nestedScrollEnabled
+          style={styles.scrollView}
+          scrollEnabled={this.state.scrollEnabled}>
+          {ITEMS.map(createItemRow)}
+        </ScrollView>
+        <Text>
+          {'Scrolling enabled = ' + this.state.scrollEnabled.toString()}
+        </Text>
+        <Button
+          label="Disable Scrolling"
+          onPress={() => {
+            this.setState({scrollEnabled: false});
+          }}
+        />
+        <Button
+          label="Enable Scrolling"
+          onPress={() => {
+            this.setState({scrollEnabled: true});
+          }}
+        />
+      </View>
+    );
+  }
+}
 
-import {useState, useCallback} from 'react';
-import type {RNTesterModuleExample} from '../../types/RNTesterTypes';
-import type {ViewStyleProp} from 'react-native/Libraries/StyleSheet/StyleSheet';
-import ScrollViewPressableStickyHeaderExample from './ScrollViewPressableStickyHeaderExample';
+let AppendingListItemCount = 6;
+class AppendingList extends React.Component<
+  {},
+  {items: Array<React$Element<Class<Item>>>},
+> {
+  state: {items: Array<React.Element<Class<Item>>>} = {
+    items: [...Array(AppendingListItemCount)].map((_, ii) => (
+      <Item msg={`Item ${ii}`} />
+    )),
+  };
+  render(): React.Node {
+    return (
+      <View>
+        <ScrollView
+          automaticallyAdjustContentInsets={false}
+          maintainVisibleContentPosition={{
+            minIndexForVisible: 0,
+            autoscrollToTopThreshold: 10,
+          }}
+          nestedScrollEnabled
+          style={styles.scrollView}>
+          {this.state.items.map(item =>
+            // $FlowFixMe[prop-missing] React.Element internal inspection
+            React.cloneElement(item, {key: item.props.msg}),
+          )}
+        </ScrollView>
+        <ScrollView
+          horizontal={true}
+          automaticallyAdjustContentInsets={false}
+          maintainVisibleContentPosition={{
+            minIndexForVisible: 1,
+            autoscrollToTopThreshold: 10,
+          }}
+          style={[styles.scrollView, styles.horizontalScrollView]}>
+          {this.state.items.map(item =>
+            // $FlowFixMe[prop-missing] React.Element internal inspection
+            React.cloneElement(item, {key: item.props.msg, style: null}),
+          )}
+        </ScrollView>
+        <View style={styles.row}>
+          <Button
+            label="Add to top"
+            onPress={() => {
+              this.setState(state => {
+                const idx = AppendingListItemCount++;
+                return {
+                  items: [
+                    <Item style={{paddingTop: idx * 5}} msg={`Item ${idx}`} />,
+                  ].concat(state.items),
+                };
+              });
+            }}
+          />
+          <Button
+            label="Remove top"
+            onPress={() => {
+              this.setState(state => ({
+                items: state.items.slice(1),
+              }));
+            }}
+          />
+          <Button
+            label="Change height top"
+            onPress={() => {
+              this.setState(state => ({
+                items: [
+                  React.cloneElement(state.items[0], {
+                    style: {paddingBottom: Math.random() * 40},
+                  }),
+                ].concat(state.items.slice(1)),
+              }));
+            }}
+          />
+        </View>
+        <View style={styles.row}>
+          <Button
+            label="Add to end"
+            onPress={() => {
+              this.setState(state => ({
+                items: state.items.concat(
+                  <Item msg={`Item ${AppendingListItemCount++}`} />,
+                ),
+              }));
+            }}
+          />
+          <Button
+            label="Remove end"
+            onPress={() => {
+              this.setState(state => ({
+                items: state.items.slice(0, -1),
+              }));
+            }}
+          />
+          <Button
+            label="Change height end"
+            onPress={() => {
+              this.setState(state => ({
+                items: state.items.slice(0, -1).concat(
+                  React.cloneElement(state.items[state.items.length - 1], {
+                    style: {paddingBottom: Math.random() * 40},
+                  }),
+                ),
+              }));
+            }}
+          />
+        </View>
+      </View>
+    );
+  }
+}
+
+function CenterContentList(): React.Node {
+  return (
+    <ScrollView
+      nestedScrollEnabled
+      style={styles.scrollView}
+      centerContent={true}>
+      <Text>This should be in center.</Text>
+    </ScrollView>
+  );
+}
+
+function ContentOffsetList(): React.Node {
+  return (
+    <ScrollView
+      style={[styles.scrollView, {height: 100}]}
+      horizontal={true}
+      contentOffset={{x: 100, y: 0}}>
+      {ITEMS.map(createItemRow)}
+    </ScrollView>
+  );
+}
 
 exports.displayName = 'ScrollViewExample';
 exports.title = 'ScrollView';
@@ -45,10 +210,12 @@ const examples = ([
       return (
         <View>
           <ScrollView
+            accessibilityRole="grid"
             ref={scrollView => {
               _scrollView = scrollView;
             }}
             automaticallyAdjustContentInsets={false}
+            nestedScrollEnabled
             onScroll={() => {
               console.log('onScroll!');
             }}
@@ -60,21 +227,21 @@ const examples = ([
           <Button
             label="Scroll to top"
             onPress={() => {
-              nullthrows(_scrollView).scrollTo({y: 0});
+              nullthrows<$FlowFixMe>(_scrollView).scrollTo({y: 0});
             }}
             testID="scroll_to_top_button"
           />
           <Button
             label="Scroll to bottom"
             onPress={() => {
-              nullthrows(_scrollView).scrollToEnd({animated: true});
+              nullthrows<$FlowFixMe>(_scrollView).scrollToEnd({animated: true});
             }}
             testID="scroll_to_bottom_button"
           />
           <Button
             label="Flash scroll indicators"
             onPress={() => {
-              nullthrows(_scrollView).flashScrollIndicators();
+              nullthrows<$FlowFixMe>(_scrollView).flashScrollIndicators();
             }}
             testID="flash_scroll_indicators_button"
           />
@@ -112,41 +279,6 @@ const examples = ([
     title: '<ScrollView> enable & disable\n',
     description: 'ScrollView scrolling behaviour can be disabled and enabled',
     render: function (): React.Node {
-      class EnableDisableList extends React.Component<
-        {},
-        {scrollEnabled: boolean},
-      > {
-        state = {
-          scrollEnabled: true,
-        };
-        render() {
-          return (
-            <View>
-              <ScrollView
-                automaticallyAdjustContentInsets={false}
-                style={styles.scrollView}
-                scrollEnabled={this.state.scrollEnabled}>
-                {ITEMS.map(createItemRow)}
-              </ScrollView>
-              <Text>
-                {'Scrolling enabled = ' + this.state.scrollEnabled.toString()}
-              </Text>
-              <Button
-                label="Disable Scrolling"
-                onPress={() => {
-                  this.setState({scrollEnabled: false});
-                }}
-              />
-              <Button
-                label="Enable Scrolling"
-                onPress={() => {
-                  this.setState({scrollEnabled: true});
-                }}
-              />
-            </View>
-          );
-        }
-      }
       return <EnableDisableList />;
     },
   },
@@ -266,160 +398,30 @@ const examples = ([
       return <SnapToOptions />;
     },
   },
-]: Array<RNTesterModuleExample>);
-
-if (Platform.OS === 'ios') {
-  examples.push({
+  {
+    title: '<ScrollView> (contentOffset = {x: 100, y: 0})\n',
+    description: 'Initial contentOffset can be set on ScrollView.',
+    render: function (): React.Node {
+      return <ContentOffsetList />;
+    },
+  },
+  {
     title: '<ScrollView> smooth bi-directional content loading\n',
     description:
       'The `maintainVisibleContentPosition` prop allows insertions to either end of the content ' +
       'without causing the visible content to jump. Re-ordering is not supported.',
     render: function () {
-      let itemCount = 6;
-      class AppendingList extends React.Component<
-        {},
-        {items: Array<React.Element<typeof Item>>},
-      > {
-        state = {
-          items: [...Array(itemCount)].map((_, ii) => (
-            <Item msg={`Item ${ii}`} />
-          )),
-        };
-        render() {
-          return (
-            <View>
-              <ScrollView
-                automaticallyAdjustContentInsets={false}
-                maintainVisibleContentPosition={{
-                  minIndexForVisible: 1,
-                  autoscrollToTopThreshold: 10,
-                }}
-                style={styles.scrollView}>
-                {this.state.items.map(item =>
-                  React.cloneElement(item, {key: item.props.msg}),
-                )}
-              </ScrollView>
-              <ScrollView
-                horizontal={true}
-                automaticallyAdjustContentInsets={false}
-                maintainVisibleContentPosition={{
-                  minIndexForVisible: 1,
-                  autoscrollToTopThreshold: 10,
-                }}
-                style={[styles.scrollView, styles.horizontalScrollView]}>
-                {this.state.items.map(item =>
-                  React.cloneElement(item, {key: item.props.msg, style: null}),
-                )}
-              </ScrollView>
-              <View style={styles.row}>
-                <Button
-                  label="Add to top"
-                  onPress={() => {
-                    this.setState(state => {
-                      const idx = itemCount++;
-                      return {
-                        items: [
-                          <Item
-                            style={{paddingTop: idx * 5}}
-                            msg={`Item ${idx}`}
-                          />,
-                        ].concat(state.items),
-                      };
-                    });
-                  }}
-                />
-                <Button
-                  label="Remove top"
-                  onPress={() => {
-                    this.setState(state => ({
-                      items: state.items.slice(1),
-                    }));
-                  }}
-                />
-                <Button
-                  label="Change height top"
-                  onPress={() => {
-                    this.setState(state => ({
-                      items: [
-                        React.cloneElement(state.items[0], {
-                          style: {paddingBottom: Math.random() * 40},
-                        }),
-                      ].concat(state.items.slice(1)),
-                    }));
-                  }}
-                />
-              </View>
-              <View style={styles.row}>
-                <Button
-                  label="Add to end"
-                  onPress={() => {
-                    this.setState(state => ({
-                      items: state.items.concat(
-                        <Item msg={`Item ${itemCount++}`} />,
-                      ),
-                    }));
-                  }}
-                />
-                <Button
-                  label="Remove end"
-                  onPress={() => {
-                    this.setState(state => ({
-                      items: state.items.slice(0, -1),
-                    }));
-                  }}
-                />
-                <Button
-                  label="Change height end"
-                  onPress={() => {
-                    this.setState(state => ({
-                      items: state.items.slice(0, -1).concat(
-                        React.cloneElement(
-                          state.items[state.items.length - 1],
-                          {
-                            style: {paddingBottom: Math.random() * 40},
-                          },
-                        ),
-                      ),
-                    }));
-                  }}
-                />
-              </View>
-            </View>
-          );
-        }
-      }
       return <AppendingList />;
     },
-  });
+  },
+]: Array<RNTesterModuleExample>);
+
+if (Platform.OS === 'ios') {
   examples.push({
     title: '<ScrollView> (centerContent = true)\n',
     description:
       'ScrollView puts its content in the center if the content is smaller than scroll view',
     render: function (): React.Node {
-      function CenterContentList(): React.Node {
-        return (
-          <ScrollView style={styles.scrollView} centerContent={true}>
-            <Text>This should be in center.</Text>
-          </ScrollView>
-        );
-      }
-      return <CenterContentList />;
-    },
-  });
-  examples.push({
-    title: '<ScrollView> (contentOffset = {x: 100, y: 0})\n',
-    description: 'Initial contentOffset can be set on ScrollView.',
-    render: function (): React.Node {
-      function CenterContentList(): React.Node {
-        return (
-          <ScrollView
-            style={[styles.scrollView, {height: 100}]}
-            horizontal={true}
-            contentOffset={{x: 100, y: 0}}>
-            {ITEMS.map(createItemRow)}
-          </ScrollView>
-        );
-      }
       return <CenterContentList />;
     },
   });
@@ -497,6 +499,7 @@ const AndroidScrollBarOptions = () => {
     <View>
       <ScrollView
         style={[styles.scrollView, {height: 200}]}
+        nestedScrollEnabled
         persistentScrollbar={persistentScrollBar}>
         {ITEMS.map(createItemRow)}
       </ScrollView>
@@ -515,6 +518,7 @@ const HorizontalScrollView = (props: {direction: 'ltr' | 'rtl'}) => {
   return (
     <View style={{direction}}>
       <Text style={styles.text}>{title}</Text>
+      {/* $FlowFixMe[incompatible-use] */}
       <ScrollView
         ref={scrollRef}
         automaticallyAdjustContentInsets={false}
@@ -526,14 +530,16 @@ const HorizontalScrollView = (props: {direction: 'ltr' | 'rtl'}) => {
       <Button
         label="Scroll to start"
         onPress={() => {
-          nullthrows(scrollRef.current).scrollTo({x: 0});
+          nullthrows<$FlowFixMe>(scrollRef.current).scrollTo({x: 0});
         }}
         testID={'scroll_to_start_button'}
       />
       <Button
         label="Scroll to end"
         onPress={() => {
-          nullthrows(scrollRef.current).scrollToEnd({animated: true});
+          nullthrows<$FlowFixMe>(scrollRef.current).scrollToEnd({
+            animated: true,
+          });
         }}
         testID={'scroll_to_end_button'}
       />
@@ -574,7 +580,7 @@ const SnapToOptions = () => {
   const snapToAlignmentModes = ['start', 'center', 'end'];
   const [snapToEnd, setSnapToEnd] = useState(true);
   const [snapToInterval, setSnapToInterval] = useState(0);
-  const [snapToOffsets, setSnapToOffsets] = useState([]);
+  const [snapToOffsets, setSnapToOffsets] = useState<Array<number>>([]);
   const [snapToStart, setSnapToStart] = useState(true);
 
   return (
@@ -659,10 +665,15 @@ const ScrollToOptions = () => {
 };
 
 const ScrollIndicatorExample = () => {
-  const [scrollIndicatorInsets, setScrollIndicatorInsets] = useState(null);
+  const [scrollIndicatorInsets, setScrollIndicatorInsets] = useState<null | {
+    bottom: number,
+    left: number,
+    right: number,
+    top: number,
+  }>(null);
   const [showsHorizontalScrollIndic, setShowsHorizontalScrollIndic] =
     useState(true);
-  const [showsVerticallScrollIndic, setShowsVerticalScrollIndic] =
+  const [showsVerticalScrollIndic, setShowsVerticalScrollIndic] =
     useState(true);
   return (
     <View>
@@ -671,7 +682,7 @@ const ScrollIndicatorExample = () => {
         contentInset={{top: 10, bottom: 10, left: 10, right: 10}}
         scrollIndicatorInsets={scrollIndicatorInsets}
         showsHorizontalScrollIndicator={showsHorizontalScrollIndic}
-        showsVerticalScrollIndicator={showsVerticallScrollIndic}
+        showsVerticalScrollIndicator={showsVerticalScrollIndic}
         nestedScrollEnabled>
         {ITEMS.map(createItemRow)}
       </ScrollView>
@@ -703,10 +714,9 @@ const ScrollIndicatorExample = () => {
       />
       <Button
         label={
-          'showsVerticalScrollIndicator: ' +
-          showsVerticallScrollIndic.toString()
+          'showsVerticalScrollIndicator: ' + showsVerticalScrollIndic.toString()
         }
-        onPress={() => setShowsVerticalScrollIndic(!showsVerticallScrollIndic)}
+        onPress={() => setShowsVerticalScrollIndic(!showsVerticalScrollIndic)}
       />
     </View>
   );
@@ -734,10 +744,11 @@ const RefreshControlExample = () => {
   const [refreshing, setRefreshing] = useState(false);
   const onRefresh = useCallback(() => {
     setRefreshing(true);
+    // $FlowFixMe[unused-promise]
     wait(2000).then(() => setRefreshing(false));
   }, []);
 
-  const wait = timeout => {
+  const wait = (timeout: number) => {
     return new Promise(resolve => {
       setTimeout(resolve, timeout);
     });
@@ -938,6 +949,7 @@ const InvertStickyHeaders = () => {
   const _scrollView = React.useRef<?React.ElementRef<typeof ScrollView>>(null);
   return (
     <View>
+      {/* $FlowFixMe[incompatible-use] */}
       <ScrollView
         ref={_scrollView}
         style={[styles.scrollView, {height: 200}]}
@@ -956,14 +968,16 @@ const InvertStickyHeaders = () => {
         <Button
           label="Scroll to top"
           onPress={() => {
-            nullthrows(_scrollView.current).scrollTo({y: 0});
+            nullthrows<$FlowFixMe>(_scrollView.current).scrollTo({y: 0});
           }}
           testID="scroll_to_top_button"
         />
         <Button
           label="Scroll to bottom"
           onPress={() => {
-            nullthrows(_scrollView.current).scrollToEnd({animated: true});
+            nullthrows<$FlowFixMe>(_scrollView.current).scrollToEnd({
+              animated: true,
+            });
           }}
           testID="scroll_to_bottom_button"
         />
@@ -977,6 +991,7 @@ const MultipleStickyHeaders = () => {
   const stickyHeaderStyle = {backgroundColor: 'yellow'};
   return (
     <View>
+      {/* $FlowFixMe[incompatible-use] */}
       <ScrollView
         ref={_scrollView}
         style={[styles.scrollView, {height: 200}]}
@@ -994,14 +1009,16 @@ const MultipleStickyHeaders = () => {
         <Button
           label="Scroll to top"
           onPress={() => {
-            nullthrows(_scrollView.current).scrollTo({y: 0});
+            nullthrows<$FlowFixMe>(_scrollView.current).scrollTo({y: 0});
           }}
           testID="scroll_to_top_button"
         />
         <Button
           label="Scroll to bottom"
           onPress={() => {
-            nullthrows(_scrollView.current).scrollToEnd({animated: true});
+            nullthrows<$FlowFixMe>(_scrollView.current).scrollToEnd({
+              animated: true,
+            });
           }}
           testID="scroll_to_bottom_button"
         />
@@ -1106,8 +1123,15 @@ const DecelerationRateExample = () => {
 
 const ContentExample = () => {
   const [canCancelContentTouches, setCanCancelContentTouches] = useState(false);
-  const [contentInset, setContentInset] = useState(null);
-  const [contentContainerStyle, setContentContainerStyle] = useState(null);
+  const [contentInset, setContentInset] = useState<null | {
+    bottom: number,
+    left: number,
+    right: number,
+    top: number,
+  }>(null);
+  const [contentContainerStyle, setContentContainerStyle] = useState<null | {
+    backgroundColor: string,
+  }>(null);
   const [contentInsetAdjustmentBehavior, setContentInsetAdjustmentBehavior] =
     useState('never');
   return (
@@ -1208,8 +1232,7 @@ const BouncesExampleHorizontal = () => {
         style={[styles.scrollView, {height: 200}]}
         horizontal={true}
         alwaysBounceHorizontal={bounce}
-        contentOffset={{x: 100, y: 0}}
-        nestedScrollEnabled>
+        contentOffset={{x: 100, y: 0}}>
         {ITEMS.map(createItemRow)}
       </ScrollView>
       <View>
@@ -1247,7 +1270,7 @@ class Item extends React.PureComponent<{|
   msg?: string,
   style?: ViewStyleProp,
 |}> {
-  render() {
+  render(): $FlowFixMe {
     return (
       <View style={[styles.item, this.props.style]}>
         <Text>{this.props.msg}</Text>
@@ -1258,7 +1281,9 @@ class Item extends React.PureComponent<{|
 
 let ITEMS = [...Array(12)].map((_, i) => `Item ${i}`);
 
-const createItemRow = (msg, index) => <Item key={index} msg={msg} />;
+const createItemRow = (msg: string, index: number) => (
+  <Item key={index} msg={msg} />
+);
 
 const Button = (props: {
   active?: boolean,

@@ -8,52 +8,25 @@
  * @flow
  */
 
-const RNTesterExampleFilter = require('./RNTesterExampleFilter');
-import RNTPressableRow from './RNTPressableRow';
-const React = require('react');
-
-const {
-  Platform,
-  SectionList,
-  StyleSheet,
-  Text,
-  TouchableHighlight,
-  Image,
-  View,
-} = require('react-native');
-
 import {RNTesterThemeContext} from './RNTesterTheme';
+import RNTPressableRow from './RNTPressableRow';
 
+const RNTesterExampleFilter = require('./RNTesterExampleFilter');
+const React = require('react');
+const {Platform, SectionList, StyleSheet, Text, View} = require('react-native');
+
+/* $FlowFixMe[missing-local-annot] The type annotation(s) required by Flow's
+ * LTI update could not be added via codemod */
 const ExampleModuleRow = ({
   onShowUnderlay,
   onHideUnderlay,
   item,
-  toggleBookmark,
   handlePress,
 }) => {
   const theme = React.useContext(RNTesterThemeContext);
   const platform = item.module.platform;
   const onIos = !platform || platform === 'ios';
   const onAndroid = !platform || platform === 'android';
-  const rightAddOn = (
-    <TouchableHighlight
-      style={styles.imageViewStyle}
-      onPress={() =>
-        toggleBookmark({
-          exampleType: item.exampleType,
-          key: item.key,
-        })
-      }>
-      <Image
-        style={styles.imageStyle}
-        source={
-          item.isBookmarked
-            ? require('../assets/bookmark-outline-blue.png')
-            : require('../assets/bookmark-outline-gray.png')
-        }
-      />
-    </TouchableHighlight>
-  );
   return (
     <RNTPressableRow
       title={item.module.title}
@@ -62,7 +35,6 @@ const ExampleModuleRow = ({
       onPressIn={onShowUnderlay}
       onPressOut={onHideUnderlay}
       accessibilityLabel={item.module.title + ' ' + item.module.description}
-      rightAddOn={rightAddOn}
       bottomAddOn={
         <View style={styles.bottomRowStyle}>
           <Text style={{color: theme.SecondaryLabelColor, width: 65}}>
@@ -117,12 +89,13 @@ const renderSectionHeader = ({section}: {section: any, ...}) => (
 );
 
 const RNTesterModuleList: React$AbstractComponent<any, void> = React.memo(
-  ({sections, toggleBookmark, handleModuleCardPress}) => {
+  ({sections, handleModuleCardPress}) => {
     const filter = ({example, filterRegex, category}: any) =>
       filterRegex.test(example.module.title) &&
-      (!category || example.category === category) &&
-      (!Platform.isTV || example.supportsTVOS);
+      (!category || example.category === category);
 
+    /* $FlowFixMe[missing-local-annot] The type annotation(s) required by
+     * Flow's LTI update could not be added via codemod */
     const renderListItem = ({item, section, separators}) => {
       return (
         <ExampleModuleRow
@@ -130,7 +103,6 @@ const RNTesterModuleList: React$AbstractComponent<any, void> = React.memo(
           section={section}
           onShowUnderlay={separators.highlight}
           onHideUnderlay={separators.unhighlight}
-          toggleBookmark={toggleBookmark}
           handlePress={handleModuleCardPress}
         />
       );
@@ -153,6 +125,7 @@ const RNTesterModuleList: React$AbstractComponent<any, void> = React.memo(
               automaticallyAdjustContentInsets={false}
               keyboardDismissMode="on-drag"
               renderSectionHeader={renderSectionHeader}
+              // eslint-disable-next-line react/no-unstable-nested-components
               ListFooterComponent={() => <View style={{height: 80}} />}
             />
           )}

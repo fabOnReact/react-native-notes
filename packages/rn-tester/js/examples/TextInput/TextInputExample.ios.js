@@ -10,27 +10,27 @@
 
 'use strict';
 
-const React = require('react');
-
-const {
-  Button,
-  InputAccessoryView,
-  Text,
-  TextInput,
-  View,
-  StyleSheet,
-  Slider,
-  Switch,
-  Alert,
-} = require('react-native');
+import type {
+  RNTesterModule,
+  RNTesterModuleExample,
+} from '../../types/RNTesterTypes';
 import type {KeyboardType} from 'react-native/Libraries/Components/TextInput/TextInput';
 
 const TextInputSharedExamples = require('./TextInputSharedExamples.js');
-
-import type {RNTesterModuleExample} from '../../types/RNTesterTypes';
+const React = require('react');
+const {
+  Alert,
+  Button,
+  InputAccessoryView,
+  StyleSheet,
+  Switch,
+  Text,
+  TextInput,
+  View,
+} = require('react-native');
 
 class WithLabel extends React.Component<$FlowFixMeProps> {
-  render() {
+  render(): React.Node {
     return (
       <View style={styles.labelContainer}>
         <View style={styles.label}>
@@ -46,12 +46,12 @@ class TextInputAccessoryViewChangeTextExample extends React.Component<
   {...},
   {text: string},
 > {
-  constructor(props) {
+  constructor(props: void | {...}) {
     super(props);
     this.state = {text: 'Placeholder Text'};
   }
 
-  render() {
+  render(): React.Node {
     const inputAccessoryViewID = 'inputAccessoryView1';
     return (
       <View>
@@ -79,7 +79,7 @@ class TextInputAccessoryViewChangeKeyboardExample extends React.Component<
   {...},
   {keyboardType: string, text: string},
 > {
-  constructor(props) {
+  constructor(props: void | {...}) {
     super(props);
     this.state = {text: '', keyboardType: 'default'};
   }
@@ -91,11 +91,12 @@ class TextInputAccessoryViewChangeKeyboardExample extends React.Component<
     });
   };
 
-  render() {
+  render(): React.Node {
     const inputAccessoryViewID = 'inputAccessoryView2';
     return (
       <View>
         <Text>Set InputAccessoryView with ID & switch keyboard:</Text>
+        {/* $FlowFixMe[incompatible-use] */}
         <TextInput
           style={styles.default}
           inputAccessoryViewID={inputAccessoryViewID}
@@ -121,12 +122,12 @@ class TextInputAccessoryViewDefaultDoneButtonExample extends React.Component<
   |}>,
   {text: string},
 > {
-  constructor(props) {
+  constructor(props: void | $ReadOnly<{keyboardType: KeyboardType}>) {
     super(props);
     this.state = {text: ''};
   }
 
-  render() {
+  render(): React.Node {
     return (
       <TextInput
         style={styles.default}
@@ -140,11 +141,11 @@ class TextInputAccessoryViewDefaultDoneButtonExample extends React.Component<
 }
 
 class RewriteExampleKana extends React.Component<$FlowFixMeProps, any> {
-  constructor(props) {
+  constructor(props: any | void) {
     super(props);
     this.state = {text: ''};
   }
-  render() {
+  render(): React.Node {
     return (
       <View style={styles.rewriteContainer}>
         <TextInput
@@ -161,7 +162,7 @@ class RewriteExampleKana extends React.Component<$FlowFixMeProps, any> {
 }
 
 class SecureEntryExample extends React.Component<$FlowFixMeProps, any> {
-  constructor(props) {
+  constructor(props: any | void) {
     super(props);
     this.state = {
       text: '',
@@ -169,7 +170,7 @@ class SecureEntryExample extends React.Component<$FlowFixMeProps, any> {
       isSecureTextEntry: true,
     };
   }
-  render() {
+  render(): React.Node {
     return (
       <View>
         <TextInput
@@ -209,12 +210,12 @@ class AutogrowingTextInputExample extends React.Component<
   $FlowFixMeProps,
   $FlowFixMeState,
 > {
-  constructor(props) {
+  constructor(props: any | void) {
     super(props);
 
     this.state = {
-      width: 100,
       multiline: true,
+      fullWidth: true,
       text: '',
       contentSize: {
         width: 0,
@@ -223,34 +224,33 @@ class AutogrowingTextInputExample extends React.Component<
     };
   }
 
-  UNSAFE_componentWillReceiveProps(props) {
+  UNSAFE_componentWillReceiveProps(props: any) {
     this.setState({
       multiline: props.multiline,
     });
   }
 
-  render() {
+  render(): React.Node {
     const {style, multiline, ...props} = this.props;
     return (
       <View>
-        <Text>Width:</Text>
-        <Slider
-          value={100}
-          minimumValue={0}
-          maximumValue={100}
-          step={10}
-          onValueChange={value => this.setState({width: value})}
+        <Text>Full width:</Text>
+        <Switch
+          value={this.state.fullWidth}
+          onValueChange={value => this.setState({fullWidth: value})}
         />
+
         <Text>Multiline:</Text>
         <Switch
           value={this.state.multiline}
           onValueChange={value => this.setState({multiline: value})}
         />
+
         <Text>TextInput:</Text>
         <TextInput
           value="prop"
           multiline={this.state.multiline}
-          style={[style, {width: this.state.width + '%'}]}
+          style={[style, {width: this.state.fullWidth ? '100%' : '50%'}]}
           onChangeText={value => this.setState({text: value})}
           onContentSizeChange={event =>
             this.setState({contentSize: event.nativeEvent.contentSize})
@@ -323,12 +323,7 @@ const styles = StyleSheet.create({
   },
 });
 
-exports.displayName = (undefined: ?string);
-exports.title = 'TextInput';
-exports.documentationURL = 'https://reactnative.dev/docs/textinput';
-exports.category = 'Basic';
-exports.description = 'Single and multi-line text inputs.';
-exports.examples = ([
+const examples: Array<RNTesterModuleExample> = [
   ...TextInputSharedExamples,
   {
     title: 'Live Re-Write (ひ -> 日)',
@@ -621,6 +616,35 @@ exports.examples = ([
     },
   },
   {
+    title: 'Editable and Read only',
+    render: function (): React.Node {
+      return (
+        <View>
+          <TextInput
+            placeholder="editable text input using editable prop"
+            style={styles.default}
+            editable
+          />
+          <TextInput
+            placeholder="uneditable text input using editable prop"
+            style={styles.default}
+            editable={false}
+          />
+          <TextInput
+            placeholder="editable text input using readOnly prop"
+            style={styles.default}
+            readOnly={false}
+          />
+          <TextInput
+            placeholder="uneditable text input using readOnly prop"
+            style={styles.default}
+            readOnly
+          />
+        </View>
+      );
+    },
+  },
+  {
     title: 'TextInput Intrinsic Size',
     render: function (): React.Node {
       return (
@@ -769,6 +793,27 @@ exports.examples = ([
     },
   },
   {
+    title: 'Text Auto Complete',
+    render: function (): React.Node {
+      return (
+        <View>
+          <WithLabel label="country">
+            <TextInput autoComplete="country" style={styles.default} />
+          </WithLabel>
+          <WithLabel label="one-time-code">
+            <TextInput autoComplete="one-time-code" style={styles.default} />
+          </WithLabel>
+          <WithLabel label="birthdate-full">
+            <TextInput autoComplete="birthdate-full" style={styles.default} />
+          </WithLabel>
+          <WithLabel label="cc-name">
+            <TextInput autoComplete="cc-name" style={styles.default} />
+          </WithLabel>
+        </View>
+      );
+    },
+  },
+  {
     title: 'Text Content Type',
     render: function (): React.Node {
       return (
@@ -778,6 +823,22 @@ exports.examples = ([
           </WithLabel>
           <WithLabel label="name">
             <TextInput textContentType="name" style={styles.default} />
+          </WithLabel>
+          <WithLabel label="postalCode, when autoComplete set">
+            <TextInput
+              textContentType="postalCode"
+              autoComplete="email"
+              style={styles.default}
+            />
+          </WithLabel>
+          <WithLabel label="creditCardExpiration">
+            <TextInput
+              textContentType="creditCardExpiration"
+              style={styles.default}
+            />
+          </WithLabel>
+          <WithLabel label="birthdate">
+            <TextInput textContentType="birthdate" style={styles.default} />
           </WithLabel>
         </View>
       );
@@ -817,4 +878,71 @@ exports.examples = ([
       );
     },
   },
-]: Array<RNTesterModuleExample>);
+  {
+    title: 'Line Break Strategy',
+    render: function (): React.Node {
+      const lineBreakStrategy = ['none', 'standard', 'hangul-word', 'push-out'];
+      const textByCode = {
+        en: 'lineBreakStrategy lineBreakStrategy lineBreakStrategy lineBreakStrategy',
+        ko: '한글개행한글개행 한글개행한글개행 한글개행한글개행 한글개행한글개행 한글개행한글개행 한글개행한글개행',
+        ja: 'かいぎょう かいぎょう かいぎょう かいぎょう かいぎょう かいぎょう',
+        cn: '改行 改行 改行 改行 改行 改行 改行 改行 改行 改行 改行 改行',
+      };
+      return (
+        <View>
+          {lineBreakStrategy.map(strategy => {
+            return (
+              <View key={strategy} style={{marginBottom: 12}}>
+                <Text
+                  style={{
+                    backgroundColor: 'lightgrey',
+                  }}>{`Strategy: ${strategy}`}</Text>
+                {Object.keys(textByCode).map(code => {
+                  return (
+                    <View key={code}>
+                      <Text style={{fontWeight: 'bold'}}>{`[${code}]`}</Text>
+                      <TextInput
+                        multiline
+                        lineBreakStrategyIOS={strategy}
+                        style={styles.default}
+                        defaultValue={textByCode[code]}
+                      />
+                    </View>
+                  );
+                })}
+              </View>
+            );
+          })}
+        </View>
+      );
+    },
+  },
+  {
+    title: 'iOS autoformatting behaviors',
+    render: function (): React.Node {
+      return (
+        <View>
+          <WithLabel label="smartInsertDelete: true | undefined">
+            <TextInput style={styles.default} defaultValue="CopyAndPaste" />
+          </WithLabel>
+          <WithLabel label="smartInsertDelete: false">
+            <TextInput
+              smartInsertDelete={false}
+              style={styles.default}
+              defaultValue="CopyAndPaste"
+            />
+          </WithLabel>
+        </View>
+      );
+    },
+  },
+];
+
+module.exports = ({
+  displayName: (undefined: ?string),
+  title: 'TextInput',
+  documentationURL: 'https://reactnative.dev/docs/textinput',
+  category: 'Basic',
+  description: 'Single and multi-line text inputs.',
+  examples,
+}: RNTesterModule);

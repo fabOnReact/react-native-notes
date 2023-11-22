@@ -11,10 +11,11 @@
 'use strict';
 
 import type {
-  SchemaType,
   NativeModuleAliasMap,
+  NativeModuleEnumMembers,
   NativeModuleObjectTypeAnnotation,
   NativeModuleSchema,
+  SchemaType,
 } from '../../CodegenSchema';
 
 const invariant = require('invariant');
@@ -47,7 +48,12 @@ function getModules(
   );
 }
 
+function getAreEnumMembersInteger(members: NativeModuleEnumMembers): boolean {
+  return !members.some(m => `${m.value}`.includes('.'));
+}
+
 module.exports = {
   createAliasResolver,
   getModules,
+  getAreEnumMembersInteger,
 };

@@ -6,7 +6,7 @@
 
 # This script assumes yarn is already installed.
 
-THIS_DIR=$(cd -P "$(dirname "$(readlink "${BASH_SOURCE[0]}" || echo "${BASH_SOURCE[0]}")")" && pwd)
+THIS_DIR=$(cd -P "$(dirname "$(realpath "${BASH_SOURCE[0]}" || echo "${BASH_SOURCE[0]}")")" && pwd)
 
 set -e
 set -u
@@ -22,6 +22,20 @@ else
   YARN_OR_NPM=$(command -v npm)
 fi
 YARN_BINARY="${YARN_BINARY:-$YARN_OR_NPM}"
+
+# mv command to use when copying files into the working directory
+EDEN_SAFE_MV="mv"
+
+if [ -x "$(command -v eden)" ]; then
+  pushd "$THIS_DIR"
+
+  # Detect if we are in an EdenFS checkout
+  if [[ "$OSTYPE" == "darwin"* ]] && eden info; then
+    EDEN_SAFE_MV="cp -R -X"
+  fi
+
+  popd >/dev/null
+fi
 
 if [[ ${FBSOURCE_ENV:-0} -eq 1 ]]; then
   # Custom FB-specific setup
@@ -56,6 +70,7 @@ else
 
   popd >/dev/null
 
-  mv "$TMP_DIR/lib" "$TMP_DIR/node_modules" "$CODEGEN_DIR"
+  $EDEN_SAFE_MV "$TMP_DIR/lib" "$CODEGEN_DIR"
+  $EDEN_SAFE_MV "$TMP_DIR/node_modules" "$CODEGEN_DIR"
   rm -rf "$TMP_DIR"
 fi

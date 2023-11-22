@@ -7,7 +7,8 @@
 
 package com.facebook.react.tasks
 
-import com.facebook.react.utils.windowsAwareYarn
+import com.facebook.react.utils.Os.cliPath
+import com.facebook.react.utils.windowsAwareCommandLine
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFile
 import org.gradle.api.provider.ListProperty
@@ -29,7 +30,14 @@ abstract class GenerateCodegenSchemaTask : Exec() {
 
   @get:Input abstract val nodeExecutableAndArgs: ListProperty<String>
 
-  @get:InputFiles val jsInputFiles = project.fileTree(jsRootDir) { it.include("**/*.js") }
+  @get:InputFiles
+  val jsInputFiles =
+      project.fileTree(jsRootDir) {
+        it.include("**/*.js")
+        it.include("**/*.ts")
+        // We want to exclude the build directory, to don't pick them up for execution avoidance.
+        it.exclude("**/build/**/*")
+      }
 
   @get:OutputFile
   val generatedSchemaFile: Provider<RegularFile> = generatedSrcDir.file("schema.json")
@@ -48,16 +56,19 @@ abstract class GenerateCodegenSchemaTask : Exec() {
   }
 
   internal fun setupCommandLine() {
+    val workingDir = project.projectDir
     commandLine(
-        windowsAwareYarn(
+        windowsAwareCommandLine(
             *nodeExecutableAndArgs.get().toTypedArray(),
             codegenDir
                 .file("lib/cli/combine/combine-js-to-schema-cli.js")
                 .get()
                 .asFile
-                .absolutePath,
-            generatedSchemaFile.get().asFile.absolutePath,
-            jsRootDir.asFile.get().absolutePath,
+                .cliPath(workingDir),
+            "--platform",
+            "android",
+            generatedSchemaFile.get().asFile.cliPath(workingDir),
+            jsRootDir.asFile.get().cliPath(workingDir),
         ))
   }
 }

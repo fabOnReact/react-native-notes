@@ -11,21 +11,20 @@
 'use strict';
 
 const React = require('react');
-
 const {
   Alert,
   Animated,
+  Button,
   I18nManager,
   Image,
   PixelRatio,
   Platform,
   StyleSheet,
+  Switch,
   Text,
   TextInput,
   TouchableWithoutFeedback,
-  Switch,
   View,
-  Button,
 } = require('react-native');
 
 type RTLToggleState = {isRTL: boolean, ...};
@@ -43,7 +42,7 @@ const IMAGE_SIZE = [IMAGE_DIMENSION, IMAGE_DIMENSION];
 
 const IS_RTL = I18nManager.isRTL;
 
-function ListItem(props) {
+function ListItem(props: {imageSource: number}) {
   return (
     <View style={styles.row}>
       <View style={styles.column1}>
@@ -127,7 +126,10 @@ const IconsExample = withRTLState(({isRTL, setRTL}) => {
   );
 });
 
-function AnimationBlock(props) {
+function AnimationBlock(props: {
+  imgStyle: {transform: Array<{scaleX: number} | {translateX: any}>},
+  onPress: (e: any) => void,
+}) {
   return (
     <View style={styles.block}>
       <TouchableWithoutFeedback onPress={props.onPress}>
@@ -144,11 +146,19 @@ type RTLSwitcherComponentState = {|
   isRTL: boolean,
 |};
 
-function withRTLState(Component) {
+function withRTLState(
+  Component: ({
+    isRTL: boolean,
+    setRTL: (isRTL: boolean) => void,
+    style?: any,
+  }) => React.Node,
+) {
   return class extends React.Component<
     {style?: any},
     RTLSwitcherComponentState,
   > {
+    /* $FlowFixMe[missing-local-annot] The type annotation(s) required by
+     * Flow's LTI update could not be added via codemod */
     constructor(...args) {
       super(...args);
       this.state = {
@@ -156,8 +166,9 @@ function withRTLState(Component) {
       };
     }
 
+    // $FlowFixMe[missing-local-annot]
     render() {
-      const setRTL = isRTL => this.setState({isRTL: isRTL});
+      const setRTL = (isRTL: boolean) => this.setState({isRTL: isRTL});
       return (
         <Component isRTL={this.state.isRTL} setRTL={setRTL} {...this.props} />
       );
@@ -165,7 +176,12 @@ function withRTLState(Component) {
   };
 }
 
-const RTLToggler = ({isRTL, setRTL}) => {
+const RTLToggler = ({
+  isRTL,
+  setRTL,
+}:
+  | {isRTL: any, setRTL: any}
+  | {isRTL: boolean, setRTL: (isRTL: boolean) => void}) => {
   if (Platform.OS === 'android') {
     return <Text style={styles.rtlToggler}>{isRTL ? 'RTL' : 'LTR'}</Text>;
   }
@@ -190,7 +206,7 @@ class RTLToggleExample extends React.Component<any, RTLToggleState> {
     };
   }
 
-  render() {
+  render(): React.Node {
     return (
       <View>
         <View style={styles.directionBox}>
@@ -251,7 +267,7 @@ class AnimationExample extends React.Component<any, AnimationState> {
     };
   }
 
-  render() {
+  render(): React.Node {
     return (
       <View>
         <RTLToggler setRTL={this.props.setRTL} isRTL={this.props.isRTL} />
@@ -492,6 +508,35 @@ const BorderRadiiExample = withRTLState(({isRTL, setRTL}) => {
   );
 });
 
+const LogicalBorderRadiiExample = withRTLState(({isRTL, setRTL}) => {
+  return (
+    <View>
+      <Text style={styles.bold}>Styles</Text>
+      <Text>borderStartStartRadius: 10,</Text>
+      <Text>borderStartEndRadius: 20,</Text>
+      <Text>borderEndStartRadius: 30,</Text>
+      <Text>borderEndEndRadius: 40</Text>
+      <Text />
+      <Text style={styles.bold}>Demo: </Text>
+      <View style={directionStyle(isRTL)}>
+        <View
+          style={{
+            borderWidth: 10,
+            borderStartStartRadius: 10,
+            borderStartEndRadius: 20,
+            borderEndStartRadius: 30,
+            borderEndEndRadius: 40,
+            padding: 10,
+          }}>
+          <View>
+            <RTLToggler setRTL={setRTL} isRTL={isRTL} />
+          </View>
+        </View>
+      </View>
+    </View>
+  );
+});
+
 const BorderExample = withRTLState(({isRTL, setRTL}) => {
   return (
     <View>
@@ -528,7 +573,7 @@ const BorderExample = withRTLState(({isRTL, setRTL}) => {
   );
 });
 
-const directionStyle = isRTL =>
+const directionStyle = (isRTL: boolean) =>
   Platform.OS !== 'android' ? {direction: isRTL ? 'rtl' : 'ltr'} : null;
 
 const styles = StyleSheet.create({
@@ -752,6 +797,12 @@ exports.examples = [
     title: 'Border Radii Start/End',
     render: function (): React.Element<any> {
       return <BorderRadiiExample />;
+    },
+  },
+  {
+    title: 'Logical Border Radii Start/End',
+    render: function (): React.Element<any> {
+      return <LogicalBorderRadiiExample />;
     },
   },
   {

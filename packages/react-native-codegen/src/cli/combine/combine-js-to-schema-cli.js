@@ -4,41 +4,34 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- * @emails oncall+react_native
  * @flow strict-local
  * @format
+ * @oncall react_native
  */
 
 'use strict';
 
 const combine = require('./combine-js-to-schema');
+const {filterJSFile, parseArgs} = require('./combine-utils');
 const fs = require('fs');
 const glob = require('glob');
 const path = require('path');
 
-const [outfile, ...fileList] = process.argv.slice(2);
-
-function filterJSFile(file: string) {
-  return (
-    /^(Native.+|.+NativeComponent)/.test(path.basename(file)) &&
-    // NativeUIManager will be deprecated by Fabric UIManager.
-    // For now, ignore this spec completely because the types are not fully supported.
-    !file.endsWith('NativeUIManager.js') &&
-    // NativeSampleTurboModule is for demo purpose. It should be added manually to the
-    // app for now.
-    !file.endsWith('NativeSampleTurboModule.js') &&
-    !file.includes('__tests')
-  );
-}
+const {platform, outfile, fileList} = parseArgs(process.argv);
 
 const allFiles = [];
 fileList.forEach(file => {
   if (fs.lstatSync(file).isDirectory()) {
+    const filePattern = path.sep === '\\' ? file.replace(/\\/g, '/') : file;
     const dirFiles = glob
-      .sync(`${file}/**/*.{js,ts,tsx}`, {
+      .sync(`${filePattern}/**/*.{js,ts,tsx}`, {
         nodir: true,
+        // TODO: This will remove the need of slash substitution above for Windows,
+        // but it requires glob@v9+; with the package currenlty relying on
+        // glob@7.1.1; and flow-typed repo not having definitions for glob@9+.
+        // windowsPathsNoEscape: true,
       })
-      .filter(filterJSFile);
+      .filter(element => filterJSFile(element, platform));
     allFiles.push(...dirFiles);
   } else if (filterJSFile(file)) {
     allFiles.push(file);

@@ -7,10 +7,10 @@
 
 #import "RNTMyNativeViewComponentView.h"
 
-#import <react/renderer/components/MyNativeViewSpec/ComponentDescriptors.h>
-#import <react/renderer/components/MyNativeViewSpec/EventEmitters.h>
-#import <react/renderer/components/MyNativeViewSpec/Props.h>
-#import <react/renderer/components/MyNativeViewSpec/RCTComponentViewHelpers.h>
+#import <react/renderer/components/AppSpecs/ComponentDescriptors.h>
+#import <react/renderer/components/AppSpecs/EventEmitters.h>
+#import <react/renderer/components/AppSpecs/Props.h>
+#import <react/renderer/components/AppSpecs/RCTComponentViewHelpers.h>
 
 #import "RCTFabricComponentsPlugins.h"
 
@@ -26,6 +26,14 @@ using namespace facebook::react;
 + (ComponentDescriptorProvider)componentDescriptorProvider
 {
   return concreteComponentDescriptorProvider<RNTMyNativeViewComponentDescriptor>();
+}
+
+// Load is not invoked if it is not defined, therefore, we must ask to update this.
+// See the Apple documentation: https://developer.apple.com/documentation/objectivec/nsobject/1418815-load?language=objc
+// "[...] but only if the newly loaded class or category implements a method that can respond."
++ (void)load
+{
+  [super load];
 }
 
 - (instancetype)initWithFrame:(CGRect)frame
@@ -56,8 +64,46 @@ using namespace facebook::react;
                          alpha:1.0];
 }
 
-- (void)updateProps:(Props::Shared const &)props oldProps:(Props::Shared const &)oldProps
+- (void)updateProps:(const Props::Shared &)props oldProps:(const Props::Shared &)oldProps
 {
+  const auto &oldViewProps = *std::static_pointer_cast<const RNTMyNativeViewProps>(_props);
+  const auto &newViewProps = *std::static_pointer_cast<const RNTMyNativeViewProps>(props);
+
+  if (oldViewProps.values != newViewProps.values) {
+    if (_eventEmitter) {
+      std::vector<int> newVector = {};
+      std::vector<bool> newBoolVector = {};
+      std::vector<Float> newFloatVector = {};
+      std::vector<double> newDoubleVector = {};
+      std::vector<RNTMyNativeViewEventEmitter::OnIntArrayChangedYesNos> newYesNoVector = {};
+      std::vector<std::string> newStringVector = {};
+      std::vector<RNTMyNativeViewEventEmitter::OnIntArrayChangedLatLons> newLatLonVector = {};
+      std::vector<std::vector<int>> newIntVectorVector = {};
+      for (auto val : newViewProps.values) {
+        newVector.push_back(val * 2);
+        newBoolVector.push_back(val % 2 ? true : false);
+        newFloatVector.push_back(val * 3.14);
+        newDoubleVector.push_back(val / 3.14);
+        newYesNoVector.push_back(
+            val % 2 ? RNTMyNativeViewEventEmitter::OnIntArrayChangedYesNos::Yep
+                    : RNTMyNativeViewEventEmitter::OnIntArrayChangedYesNos::Nope);
+        newStringVector.push_back(std::to_string(val));
+        newLatLonVector.push_back({-1.0 * val, 2.0 * val});
+        newIntVectorVector.push_back({val, val, val});
+      }
+      RNTMyNativeViewEventEmitter::OnIntArrayChanged value = {
+          newVector,
+          newBoolVector,
+          newFloatVector,
+          newDoubleVector,
+          newYesNoVector,
+          newStringVector,
+          newLatLonVector,
+          newIntVectorVector};
+      std::static_pointer_cast<const RNTMyNativeViewEventEmitter>(_eventEmitter)->onIntArrayChanged(value);
+    }
+  }
+
   [super updateProps:props oldProps:oldProps];
 }
 

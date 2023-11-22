@@ -10,11 +10,10 @@
 
 'use strict';
 
-import * as React from 'react';
-
-import {PermissionsAndroid, StyleSheet, Text, View} from 'react-native';
-import RNTOption from '../../components/RNTOption';
 import RNTesterButton from '../../components/RNTesterButton';
+import RNTOption from '../../components/RNTOption';
+import * as React from 'react';
+import {PermissionsAndroid, StyleSheet, Text, View} from 'react-native';
 
 function PermissionsExample() {
   const [permission, setPermission] = React.useState(
@@ -79,6 +78,17 @@ function PermissionsExample() {
             }
             selected={
               permission === PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+            }
+            style={styles.option}
+          />
+          <RNTOption
+            label={PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS}
+            key={PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS}
+            onPress={() =>
+              setPermission(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS)
+            }
+            selected={
+              permission === PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS
             }
             style={styles.option}
           />

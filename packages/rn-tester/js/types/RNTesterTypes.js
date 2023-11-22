@@ -5,7 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  *
  * @format
- * @flow
+ * @flow strict-local
  */
 
 import * as React from 'react';
@@ -16,7 +16,7 @@ export type RNTesterModuleExample = $ReadOnly<{|
   platform?: 'ios' | 'android',
   description?: string,
   expect?: string,
-  render: () => React.Node,
+  render: ({testID?: ?string}) => React.Node,
 |}>;
 
 export type RNTesterModule = $ReadOnly<{|
@@ -37,9 +37,7 @@ export type RNTesterModuleInfo = $ReadOnly<{|
   key: string,
   module: RNTesterModule,
   category?: string,
-  supportsTVOS?: boolean,
   documentationURL?: string,
-  isBookmarked?: boolean,
   exampleType?: 'components' | 'apis',
 |}>;
 
@@ -52,18 +50,23 @@ export type SectionData<T> = {
 export type ExamplesList = $ReadOnly<{|
   components: $ReadOnlyArray<SectionData<RNTesterModuleInfo>>,
   apis: $ReadOnlyArray<SectionData<RNTesterModuleInfo>>,
-  bookmarks: $ReadOnlyArray<SectionData<RNTesterModuleInfo>>,
 |}>;
 
-export type ScreenTypes = 'components' | 'apis' | 'bookmarks' | null;
+export type ScreenTypes = 'components' | 'apis' | null;
 
 export type ComponentList = null | {components: string[], apis: string[]};
 
-export type RNTesterState = {
+export type RNTesterNavigationState = {
   activeModuleKey: null | string,
   activeModuleTitle: null | string,
   activeModuleExampleKey: null | string,
   screen: ScreenTypes,
-  bookmarks: ComponentList,
   recentlyUsed: ComponentList,
+};
+
+export type RNTesterJsStallsState = {
+  stallIntervalId: ?IntervalID,
+  busyTime: null | number,
+  filteredStall: number,
+  tracking: boolean,
 };

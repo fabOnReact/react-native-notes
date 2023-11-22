@@ -8,43 +8,39 @@
  * @flow
  */
 
-import {
-  BackHandler,
-  StyleSheet,
-  useColorScheme,
-  View,
-  LogBox,
-} from 'react-native';
-import * as React from 'react';
+import type {RNTesterModuleInfo} from './types/RNTesterTypes';
 
 import RNTesterModuleContainer from './components/RNTesterModuleContainer';
 import RNTesterModuleList from './components/RNTesterModuleList';
 import RNTesterNavBar, {navBarHeight} from './components/RNTesterNavbar';
-import RNTesterList from './utils/RNTesterList';
-import {
-  Screens,
-  initialState,
-  getExamplesListWithBookmarksAndRecentlyUsed,
-  getInitialStateFromAsyncStorage,
-} from './utils/testerStateUtils';
-import {useAsyncStorageReducer} from './utils/useAsyncStorageReducer';
-import {RNTesterReducer, RNTesterActionsType} from './utils/RNTesterReducer';
 import {RNTesterThemeContext, themes} from './components/RNTesterTheme';
 import RNTTitleBar from './components/RNTTitleBar';
-import {RNTesterEmptyBookmarksState} from './components/RNTesterEmptyBookmarksState';
+import RNTesterList from './utils/RNTesterList';
+import {
+  RNTesterNavigationActionsType,
+  RNTesterNavigationReducer,
+} from './utils/RNTesterNavigationReducer';
+import {
+  Screens,
+  getExamplesListWithRecentlyUsed,
+  initialNavigationState,
+} from './utils/testerStateUtils';
+import * as React from 'react';
+import {BackHandler, StyleSheet, View, useColorScheme} from 'react-native';
 
-const APP_STATE_KEY = 'RNTesterAppState.v3';
+// RNTester App currently uses in memory storage for storing navigation state
 
-// RNTester App currently uses AsyncStorage from react-native for storing navigation state
-// and bookmark items.
-// TODO: Vendor AsyncStorage or create our own.
-LogBox.ignoreLogs([/AsyncStorage has been extracted from react-native/]);
-
-const RNTesterApp = (): React.Node => {
-  const [state, dispatch] = useAsyncStorageReducer(
-    RNTesterReducer,
-    initialState,
-    APP_STATE_KEY,
+const RNTesterApp = ({
+  testList,
+}: {
+  testList?: {
+    components?: Array<RNTesterModuleInfo>,
+    apis?: Array<RNTesterModuleInfo>,
+  },
+}): React.Node => {
+  const [state, dispatch] = React.useReducer(
+    RNTesterNavigationReducer,
+    initialNavigationState,
   );
   const colorScheme = useColorScheme();
 
@@ -53,30 +49,17 @@ const RNTesterApp = (): React.Node => {
     activeModuleTitle,
     activeModuleExampleKey,
     screen,
-    bookmarks,
     recentlyUsed,
   } = state;
 
-  React.useEffect(() => {
-    getInitialStateFromAsyncStorage(APP_STATE_KEY).then(
-      initialStateFromStorage => {
-        dispatch({
-          type: RNTesterActionsType.INIT_FROM_STORAGE,
-          data: initialStateFromStorage,
-        });
-      },
-    );
-  }, [dispatch]);
-
   const examplesList = React.useMemo(
-    () =>
-      getExamplesListWithBookmarksAndRecentlyUsed({bookmarks, recentlyUsed}),
-    [bookmarks, recentlyUsed],
+    () => getExamplesListWithRecentlyUsed({recentlyUsed, testList}),
+    [recentlyUsed, testList],
   );
 
   const handleBackPress = React.useCallback(() => {
     if (activeModuleKey != null) {
-      dispatch({type: RNTesterActionsType.BACK_BUTTON_PRESS});
+      dispatch({type: RNTesterNavigationActionsType.BACK_BUTTON_PRESS});
     }
   }, [dispatch, activeModuleKey]);
 
@@ -101,9 +84,9 @@ const RNTesterApp = (): React.Node => {
   }, [activeModuleKey, handleBackPress]);
 
   const handleModuleCardPress = React.useCallback(
-    ({exampleType, key, title}) => {
+    ({exampleType, key, title}: any) => {
       dispatch({
-        type: RNTesterActionsType.MODULE_CARD_PRESS,
+        type: RNTesterNavigationActionsType.MODULE_CARD_PRESS,
         data: {exampleType, key, title},
       });
     },
@@ -111,29 +94,19 @@ const RNTesterApp = (): React.Node => {
   );
 
   const handleModuleExampleCardPress = React.useCallback(
-    exampleName => {
+    (exampleName: string) => {
       dispatch({
-        type: RNTesterActionsType.EXAMPLE_CARD_PRESS,
+        type: RNTesterNavigationActionsType.EXAMPLE_CARD_PRESS,
         data: {key: exampleName},
       });
     },
     [dispatch],
   );
 
-  const toggleBookmark = React.useCallback(
-    ({exampleType, key}) => {
-      dispatch({
-        type: RNTesterActionsType.BOOKMARK_PRESS,
-        data: {exampleType, key},
-      });
-    },
-    [dispatch],
-  );
-
   const handleNavBarPress = React.useCallback(
-    args => {
+    (args: {screen: string}) => {
       dispatch({
-        type: RNTesterActionsType.NAVBAR_PRESS,
+        type: RNTesterNavigationActionsType.NAVBAR_PRESS,
         data: {screen: args.screen},
       });
     },
@@ -157,16 +130,10 @@ const RNTesterApp = (): React.Node => {
       ? activeModuleTitle
       : screen === Screens.COMPONENTS
       ? 'Components'
-      : screen === Screens.APIS
-      ? 'APIs'
-      : 'Bookmarks';
+      : 'APIs';
 
   const activeExampleList =
-    screen === Screens.COMPONENTS
-      ? examplesList.components
-      : screen === Screens.APIS
-      ? examplesList.apis
-      : examplesList.bookmarks;
+    screen === Screens.COMPONENTS ? examplesList.components : examplesList.apis;
 
   return (
     <RNTesterThemeContext.Provider value={theme}>
@@ -186,13 +153,9 @@ const RNTesterApp = (): React.Node => {
             example={activeModuleExample}
             onExampleCardPress={handleModuleExampleCardPress}
           />
-        ) : screen === Screens.BOOKMARKS &&
-          examplesList.bookmarks.length === 0 ? (
-          <RNTesterEmptyBookmarksState />
         ) : (
           <RNTesterModuleList
             sections={activeExampleList}
-            toggleBookmark={toggleBookmark}
             handleModuleCardPress={handleModuleCardPress}
           />
         )}

@@ -8,14 +8,18 @@
  * @flow
  */
 
+import Platform from 'react-native/Libraries/Utilities/Platform';
+
 const React = require('react');
 const ReactNative = require('react-native');
-import Platform from 'react-native/Libraries/Utilities/Platform';
 const {DynamicColorIOS, PlatformColor, StyleSheet, Text, View} = ReactNative;
 
 function PlatformColorsExample() {
   function createTable() {
-    let colors = [];
+    let colors: Array<{
+      color: ReturnType<typeof PlatformColor>,
+      label: string,
+    }> = [];
     if (Platform.OS === 'ios') {
       colors = [
         // https://developer.apple.com/documentation/uikit/uicolor/ui_element_colors
@@ -214,6 +218,7 @@ function FallbackColorsExample() {
           style={{
             ...styles.colorCell,
             backgroundColor: color.color,
+            borderColor: color.color,
           }}
         />
       </View>

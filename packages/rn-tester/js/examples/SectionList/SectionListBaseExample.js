@@ -8,16 +8,15 @@
  * @format
  */
 
+import * as React from 'react';
 import {
-  Pressable,
   Button,
+  Pressable,
   SectionList,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
-
-import * as React from 'react';
 
 const DATA = [
   {
@@ -38,6 +37,8 @@ const DATA = [
   },
 ];
 
+/* $FlowFixMe[missing-local-annot] The type annotation(s) required by Flow's
+ * LTI update could not be added via codemod */
 const Item = ({item, section, separators}) => {
   return (
     <Pressable
@@ -64,7 +65,7 @@ const Item = ({item, section, separators}) => {
 };
 
 type Props = {
-  exampleProps: $Shape<React.ElementConfig<typeof SectionList>>,
+  exampleProps: Partial<React.ElementConfig<typeof SectionList>>,
   onTest?: ?() => void,
   testLabel?: ?string,
   testOutput?: ?string,
@@ -96,10 +97,13 @@ const SectionListBaseExample: React.AbstractComponent<
         ref={ref}
         testID="section_list"
         accessibilityRole="list"
+        // $FlowFixMe[incompatible-type]
         sections={DATA}
         keyExtractor={(item, index) => item + index}
         style={styles.list}
         renderItem={Item}
+        /* $FlowFixMe[prop-missing] Error revealed after improved builtin React
+         * utility types */
         renderSectionHeader={({section: {title}}) => (
           <Text style={styles.header}>{title}</Text>
         )}

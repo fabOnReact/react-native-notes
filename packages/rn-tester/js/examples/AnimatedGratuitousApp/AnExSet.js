@@ -10,6 +10,10 @@
 
 'use strict';
 
+const AnExBobble = require('./AnExBobble');
+const AnExChained = require('./AnExChained');
+const AnExScroll = require('./AnExScroll');
+const AnExTilt = require('./AnExTilt');
 const React = require('react');
 const {
   Animated,
@@ -18,11 +22,6 @@ const {
   Text,
   View,
 } = require('react-native');
-
-const AnExBobble = require('./AnExBobble');
-const AnExChained = require('./AnExChained');
-const AnExScroll = require('./AnExScroll');
-const AnExTilt = require('./AnExTilt');
 
 class AnExSet extends React.Component<Object, any> {
   constructor(props: Object) {
@@ -139,10 +138,9 @@ const styles = StyleSheet.create({
   headerText: {
     fontSize: 25,
     color: 'white',
-    shadowRadius: 3,
-    shadowColor: 'black',
-    shadowOpacity: 1,
-    shadowOffset: {height: 1},
+    textShadowRadius: 3,
+    textShadowColor: 'rgba(0, 0, 0, 1.0)',
+    textShadowOffset: {height: 1, width: 0},
   },
 });
 

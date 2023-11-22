@@ -10,16 +10,14 @@
 
 'use strict';
 import type {NativeModulePropertyShape} from '../../../CodegenSchema';
-
 import type {SchemaType} from '../../../CodegenSchema';
 import type {MethodSerializationOutput} from './serializeMethod';
 
 const {createAliasResolver, getModules} = require('../Utils');
-
-const {StructCollector} = require('./StructCollector');
 const {serializeStruct} = require('./header/serializeStruct');
 const {serializeMethod} = require('./serializeMethod');
 const {serializeModuleSource} = require('./source/serializeModule');
+const {StructCollector} = require('./StructCollector');
 
 type FilesOutput = Map<string, string>;
 
@@ -82,7 +80,7 @@ const HeaderFileTemplate = ({
 #import <React/RCTCxxConvert.h>
 #import <React/RCTManagedPointer.h>
 #import <ReactCommon/RCTTurboModule.h>
-#import <folly/Optional.h>
+#import <optional>
 #import <vector>
 
 ` +
@@ -132,14 +130,14 @@ module.exports = {
     const hasteModuleNames: Array<string> = Object.keys(nativeModules).sort();
     for (const hasteModuleName of hasteModuleNames) {
       const {
-        aliases,
+        aliasMap,
         excludedPlatforms,
         spec: {properties},
       } = nativeModules[hasteModuleName];
       if (excludedPlatforms != null && excludedPlatforms.includes('iOS')) {
         continue;
       }
-      const resolveAlias = createAliasResolver(aliases);
+      const resolveAlias = createAliasResolver(aliasMap);
       const structCollector = new StructCollector();
 
       const methodSerializations: Array<MethodSerializationOutput> = [];

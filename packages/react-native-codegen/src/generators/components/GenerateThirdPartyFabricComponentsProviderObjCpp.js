@@ -34,7 +34,9 @@ const FileTemplate = ({lookupMap}: {lookupMap: string}) => `
 
 Class<RCTComponentViewProtocol> RCTThirdPartyFabricComponentsProvider(const char *name) {
   static std::unordered_map<std::string, Class (*)(void)> sFabricComponentsClassMap = {
+    #ifndef RCT_DYNAMIC_FRAMEWORKS
 ${lookupMap}
+    #endif
   };
 
   auto p = sFabricComponentsClassMap.find(name);
@@ -75,7 +77,7 @@ module.exports = {
               return null;
             }
 
-            return Object.keys(components)
+            const componentTemplates = Object.keys(components)
               .filter(componentName => {
                 const component = components[componentName];
                 return !(
@@ -91,6 +93,8 @@ module.exports = {
 
                 return replacedTemplate;
               });
+
+            return componentTemplates.length > 0 ? componentTemplates : null;
           })
           .filter(Boolean);
       })

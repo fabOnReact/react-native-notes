@@ -9,32 +9,32 @@
  */
 
 'use strict';
-const RNTesterPage = require('../../components/RNTesterPage');
-const React = require('react');
-
-const infoLog = require('react-native/Libraries/Utilities/infoLog');
+import type {Item} from '../../components/ListExampleShared';
 
 const {
-  HeaderComponent,
   FooterComponent,
+  HeaderComponent,
   ItemComponent,
   PlainInput,
   SeparatorComponent,
   Spindicator,
-  genItemData,
+  genNewerItems,
   pressItem,
   renderSmallSwitchOption,
   renderStackedItem,
 } = require('../../components/ListExampleShared');
+const RNTesterPage = require('../../components/RNTesterPage');
+const React = require('react');
 const {
   Alert,
   Animated,
   Button,
+  SectionList,
   StyleSheet,
   Text,
   View,
-  SectionList,
 } = require('react-native');
+const infoLog = require('react-native/Libraries/Utilities/infoLog');
 
 const VIEWABILITY_CONFIG = {
   minimumViewTime: 3000,
@@ -77,6 +77,8 @@ const CONSTANT_SECTION_EXAMPLES = [
   },
 ];
 
+/* $FlowFixMe[missing-local-annot] The type annotation(s) required by Flow's
+ * LTI update could not be added via codemod */
 const renderSectionHeader = ({section}) => (
   <View style={styles.header}>
     <Text style={styles.headerText}>SECTION HEADER: {section.key}</Text>
@@ -84,6 +86,8 @@ const renderSectionHeader = ({section}) => (
   </View>
 );
 
+/* $FlowFixMe[missing-local-annot] The type annotation(s) required by Flow's
+ * LTI update could not be added via codemod */
 const renderSectionFooter = ({section}) => (
   <View style={styles.header}>
     <Text style={styles.headerText}>SECTION FOOTER: {section.key}</Text>
@@ -91,6 +95,8 @@ const renderSectionFooter = ({section}) => (
   </View>
 );
 
+/* $FlowFixMe[missing-local-annot] The type annotation(s) required by Flow's
+ * LTI update could not be added via codemod */
 const CustomSeparatorComponent = ({highlighted, text}) => (
   <View
     style={[
@@ -108,7 +114,9 @@ const EmptySectionList = () => (
 );
 
 const renderItemComponent =
-  setItemState =>
+  (setItemState: (item: Item) => void) =>
+  /* $FlowFixMe[missing-local-annot] The type annotation(s) required by Flow's
+   * LTI update could not be added via codemod */
   ({item, separators}) => {
     if (isNaN(item.key)) {
       return;
@@ -161,10 +169,10 @@ export function SectionList_scrollable(Props: {
   const [logViewable, setLogViewable] = React.useState(false);
   const [debug, setDebug] = React.useState(false);
   const [inverted, setInverted] = React.useState(false);
-  const [data, setData] = React.useState(genItemData(1000));
+  const [data, setData] = React.useState(genNewerItems(1000));
 
   const filterRegex = new RegExp(String(filterText), 'i');
-  const filter = item =>
+  const filter = (item: Item) =>
     filterRegex.test(item.text) || filterRegex.test(item.title);
   const filteredData = data.filter(filter);
   const filteredSectionData = [...CONSTANT_SECTION_EXAMPLES];
@@ -172,6 +180,7 @@ export function SectionList_scrollable(Props: {
   let startIndex = 0;
   const endIndex = filteredData.length - 1;
   for (let ii = 10; ii <= endIndex + 10; ii += 10) {
+    // $FlowFixMe[incompatible-call]
     filteredSectionData.push({
       key: `${filteredData[startIndex].key} - ${
         filteredData[Math.min(ii - 1, endIndex)].key
@@ -181,7 +190,7 @@ export function SectionList_scrollable(Props: {
     startIndex = ii;
   }
 
-  const setItemPress = item => {
+  const setItemPress = (item: Item) => {
     if (isNaN(item.key)) {
       return;
     }
@@ -190,7 +199,7 @@ export function SectionList_scrollable(Props: {
   };
 
   const ref = React.useRef<?React.ElementRef<typeof SectionList>>(null);
-  const scrollToLocation = (sectionIndex, itemIndex) => {
+  const scrollToLocation = (sectionIndex: number, itemIndex: number) => {
     // $FlowFixMe[method-unbinding] added when improving typing for this parameters
     if (ref != null && ref.current?.scrollToLocation != null) {
       ref.current.scrollToLocation({sectionIndex, itemIndex});
@@ -222,7 +231,7 @@ export function SectionList_scrollable(Props: {
   };
 
   return (
-    <RNTesterPage noSpacer={true} noScroll={true}>
+    <RNTesterPage noScroll={true}>
       <View style={styles.searchRow}>
         <PlainInput
           onChangeText={text => setFilterText(text)}
@@ -271,9 +280,11 @@ export function SectionList_scrollable(Props: {
         ref={ref}
         ListHeaderComponent={HeaderComponent}
         ListFooterComponent={FooterComponent}
+        // $FlowFixMe[missing-local-annot]
         SectionSeparatorComponent={info => (
           <CustomSeparatorComponent {...info} text="SECTION SEPARATOR" />
         )}
+        // $FlowFixMe[missing-local-annot]
         ItemSeparatorComponent={info => (
           <CustomSeparatorComponent {...info} text="ITEM SEPARATOR" />
         )}
@@ -346,7 +357,7 @@ const styles = StyleSheet.create({
 export default {
   title: 'SectionList scrollable',
   name: 'SectionList-scrollable',
-  render: function (): React.Element<typeof SectionList_scrollable> {
+  render: function (): React.MixedElement {
     return <SectionList_scrollable />;
   },
 };

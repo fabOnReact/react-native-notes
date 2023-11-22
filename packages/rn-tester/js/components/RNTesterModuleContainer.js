@@ -8,18 +8,19 @@
  * @format
  */
 
-import * as React from 'react';
-const RNTesterBlock = require('./RNTesterBlock');
-const RNTesterExampleFilter = require('./RNTesterExampleFilter');
-import RNTPressableRow from './RNTPressableRow';
-import {RNTesterThemeContext, type RNTesterTheme} from './RNTesterTheme';
-import {View, Text, StyleSheet, Platform} from 'react-native';
-import RNTTestDetails from './RNTTestDetails';
-
 import type {
   RNTesterModule,
   RNTesterModuleExample,
 } from '../types/RNTesterTypes';
+
+import {type RNTesterTheme, RNTesterThemeContext} from './RNTesterTheme';
+import RNTPressableRow from './RNTPressableRow';
+import RNTTestDetails from './RNTTestDetails';
+import * as React from 'react';
+import {Platform, StyleSheet, Text, View} from 'react-native';
+
+const RNTesterBlock = require('./RNTesterBlock');
+const RNTesterExampleFilter = require('./RNTesterExampleFilter');
 
 type Props = {
   module: RNTesterModule,
@@ -107,7 +108,13 @@ export default function RNTesterModuleContainer(props: Props): React.Node {
           sections={sections}
           filter={filter}
           render={({filteredSections}) =>
-            filteredSections[0].data.map(renderExample)
+            module.showIndividualExamples === true ? (
+              filteredSections[0].data.map(renderExample)
+            ) : (
+              <View style={styles.sectionContainer}>
+                {filteredSections[0].data.map(renderExample)}
+              </View>
+            )
           }
         />
       </View>
@@ -159,5 +166,9 @@ const styles = StyleSheet.create({
       android: 0,
     }),
     marginHorizontal: 15,
+  },
+  sectionContainer: {
+    rowGap: 30,
+    paddingVertical: 30,
   },
 });

@@ -5,12 +5,12 @@
  * LICENSE file in the root directory of this source tree.
  *
  * @format
- * @flow
+ * @flow strict-local
  */
 
-import * as React from 'react';
-import {Text, View, StyleSheet} from 'react-native';
 import RNTOption from './RNTOption';
+import * as React from 'react';
+import {StyleSheet, Text, View} from 'react-native';
 
 const PANGRAMS = {
   arabic:
@@ -40,6 +40,7 @@ const PANGRAMS = {
 export default function TextLegend(): React.Node {
   const [language, setLanguage] = React.useState('english');
   const [alignment, setAlignment] = React.useState('left');
+  // $FlowFixMe[missing-empty-array-annot]
   const [textMetrics, setTextMetrics] = React.useState([]);
   const [fontSize, setFontSize] = React.useState(50);
   return (
